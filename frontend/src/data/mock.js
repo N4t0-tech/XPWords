@@ -23,6 +23,21 @@ export const words = [
   { word: 'ELOQUENT', hint: 'adjetivo', options: ['Elegante', 'Fuerte', 'Elocuente', 'Callado'], correct: 2 },
   { word: 'PERSIST', hint: 'verbo', options: ['Rendirse', 'Olvidar', 'Escuchar', 'Persistir'], correct: 3 },
   { word: 'CUNNING', hint: 'adjetivo', options: ['Astuto', 'Amable', 'Torpe', 'Tímido'], correct: 0 },
+  { word: 'BRAVE', hint: 'adjetivo', options: ['Valiente', 'Débil', 'Tranquilo', 'Ruidoso'], correct: 0 },
+  { word: 'ANCIENT', hint: 'adjetivo', options: ['Moderno', 'Antiguo', 'Rápido', 'Joven'], correct: 1 },
+  { word: 'BRIEF', hint: 'adjetivo', options: ['Largo', 'Pesado', 'Breve', 'Fuerte'], correct: 2 },
+  { word: 'SCARCE', hint: 'adjetivo', options: ['Abundante', 'Escaso', 'Carísimo', 'Común'], correct: 1 },
+  { word: 'EAGER', hint: 'adjetivo', options: ['Aburrido', 'Cansado', 'Ansioso', 'Lento'], correct: 2 },
+  { word: 'BENEATH', hint: 'preposición', options: ['Encima', 'Debajo', 'Al lado', 'Adentro'], correct: 1 },
+  { word: 'TO SEEK', hint: 'verbo', options: ['Esconder', 'Buscar', 'Encontrar', 'Perder'], correct: 1 },
+  { word: 'TO GAZE', hint: 'verbo', options: ['Correr', 'Saltar', 'Mirar fijo', 'Cerrar'], correct: 2 },
+  { word: 'TO GRASP', hint: 'verbo', options: ['Soltar', 'Entender', 'Olvidar', 'Romper'], correct: 1 },
+  { word: 'HAZY', hint: 'adjetivo', options: ['Claro', 'Borrosos', 'Fuerte', 'Rápido'], correct: 1 },
+  { word: 'TO WHISPER', hint: 'verbo', options: ['Gritar', 'Susurrar', 'Cantar', 'Hablar'], correct: 1 },
+  { word: 'SWIFT', hint: 'adjetivo', options: ['Lento', 'Pesado', 'Rápido', 'Ancho'], correct: 2 },
+  { word: 'TO FROWN', hint: 'verbo', options: ['Sonreír', 'Fruncir el ceño', 'Saltar', 'Dormir'], correct: 1 },
+  { word: 'DREADFUL', hint: 'adjetivo', options: ['Maravilloso', 'Tranquilo', 'Horrible', 'Divertido'], correct: 2 },
+  { word: 'TO MEND', hint: 'verbo', options: ['Romper', 'Reparar', 'Comprar', 'Vender'], correct: 1 },
 ];
 
 export const games = [

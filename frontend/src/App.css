@@ -122,3 +122,22 @@ body{background:#0a0b0f;min-height:100vh;font-family:'Inter',sans-serif;color:#c
 
 .xp-toast{position:fixed;bottom:20px;right:20px;background:#0d2420;border:1px solid #2d4a40;border-radius:8px;padding:10px 16px;font-size:13px;color:#6ee7b7;display:flex;align-items:center;gap:8px;opacity:0;transition:opacity .3s;pointer-events:none;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.05em;z-index:10}
 .xp-toast.show{opacity:1}
+
+/* GAME OVER / WELCOME */
+.xp-gm-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1rem}
+.xp-gm-stat{background:#13161f;border:1px solid #1c2030;border-radius:10px;padding:1rem;text-align:center}
+.xp-gm-stat-val{font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:#6ee7b7}
+.xp-gm-stat-lbl{font-size:11px;color:#4b5563;margin-top:2px}
+
+.xp-btn-primary{background:#6ee7b7;color:#0a0b0f;border:none;border-radius:7px;padding:10px 24px;font-size:14px;font-family:'Rajdhani',sans-serif;font-weight:700;cursor:pointer;letter-spacing:.05em}
+.xp-btn-secondary{background:#13161f;color:#6b7280;border:1px solid #1c2030;border-radius:7px;padding:10px 24px;font-size:14px;font-family:'Rajdhani',sans-serif;font-weight:600;cursor:pointer;letter-spacing:.05em}
+.xp-btn-secondary:hover{border-color:#2d4a40;color:#9ca3af}
+
+.xp-timer-bg{background:#13161f;border-radius:4px;height:6px;overflow:hidden;margin-bottom:1rem}
+.xp-timer-fill{height:100%;background:#6ee7b7;border-radius:4px;transition:width .3s linear}
+
+.xp-lives{display:flex;gap:4px;font-size:18px}
+.xp-heart{color:#f87171}
+.xp-heart.lost{color:#1c2030}
+
+.xp-streak{font-size:12px;color:#f59e0b;font-family:'Rajdhani',sans-serif;font-weight:600}

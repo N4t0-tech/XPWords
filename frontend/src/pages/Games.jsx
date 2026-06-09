@@ -15,7 +15,7 @@ export default function Games() {
           <GameCard key={g.id} game={g} onStart={g.id === 'wordsnap' ? () => setStarted(true) : undefined} />
         ))}
       </div>
-      {started && <MiniGame />}
+      {started && <MiniGame onClose={() => setStarted(false)} />}
     </div>
   );
 }

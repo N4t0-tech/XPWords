@@ -6,7 +6,6 @@ const tabs = [
   { path: '/', label: 'Inicio' },
   { path: '/games', label: 'Minijuegos' },
   { path: '/resources', label: 'Recursos' },
-  { path: '/profile', label: 'Perfil' },
 ];
 
 export default function Navbar() {
@@ -24,7 +23,9 @@ export default function Navbar() {
             {t.label}
           </Link>
         ))}
-        <UserChip user={currentUser} />
+        <Link to="/profile" style={{ textDecoration: 'none' }}>
+          <UserChip user={currentUser} />
+        </Link>
       </nav>
     </header>
   );
