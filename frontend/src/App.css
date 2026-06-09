@@ -187,3 +187,27 @@ body{background:#0a0b0f;min-height:100vh;font-family:'Inter',sans-serif;color:#c
 .xp-modal-divider span{font-size:12px;color:#4b5563}
 .xp-btn-discord{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:#5865f2;color:#fff;border:none;border-radius:7px;padding:10px;font-size:13px;font-family:'Rajdhani',sans-serif;font-weight:700;cursor:pointer;letter-spacing:.05em;transition:background .2s}
 .xp-btn-discord:hover{background:#4752c4}
+
+/* COLLAPSIBLE */
+.xp-collapsible{background:#0e1018;border:1px solid #1c2030;border-radius:12px;overflow:hidden;margin-bottom:1rem;margin-top:1.5rem}
+.xp-collapsible-hdr{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:none;padding:1rem 1.2rem;cursor:pointer;font-family:'Inter',sans-serif;color:#e2e8f0;font-size:13px;font-weight:500;transition:background .2s}
+.xp-collapsible-hdr:hover{background:#13161f}
+.xp-collapsible-hdr-left{display:flex;align-items:center;gap:8px}
+.xp-collapsible-hdr-left i{font-size:16px;color:#6ee7b7}
+.xp-collapsible-hdr > i{font-size:14px;color:#4b5563}
+.xp-collapsible-body{padding:1rem 1.2rem 1.5rem;display:flex;flex-direction:column;gap:.8rem}
+
+/* SETTINGS */
+.xp-settings-card{margin-bottom:0}
+.xp-settings-form{display:flex;flex-direction:column;gap:12px}
+.xp-settings-actions{display:flex;flex-direction:column;gap:8px}
+.xp-settings-btn{display:flex;align-items:center;gap:8px;width:100%;background:#13161f;border:1px solid #1c2030;border-radius:8px;padding:10px 14px;font-size:13px;color:#9ca3af;cursor:pointer;font-family:'Inter',sans-serif;text-align:left;transition:border-color .2s}
+.xp-settings-btn:hover{border-color:#2d4a40;color:#e2e8f0}
+.xp-settings-btn i{font-size:16px;color:#6b7280}
+.xp-settings-btn-danger{border-color:#3a1515;color:#f87171}
+.xp-settings-btn-danger:hover{border-color:#f87171}
+.xp-settings-btn-danger i{color:#f87171}
+.xp-settings-btn-sm{width:auto;padding:5px 12px;font-size:11px;white-space:nowrap}
+.xp-settings-row{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#13161f;border:1px solid #1c2030;border-radius:8px;padding:10px 14px}
+.xp-settings-row-info{display:flex;align-items:center;gap:8px;font-size:13px;color:#9ca3af}
+.xp-settings-divider{border:none;border-top:1px solid #1c2030;margin:4px 0}

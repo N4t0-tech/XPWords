@@ -20,6 +20,10 @@ export default function App() {
     setAuthMode(null);
   }
 
+  function handleLogout() {
+    setLoggedIn(false);
+  }
+
   return (
     <BrowserRouter>
       <div className="xp">
@@ -34,7 +38,7 @@ export default function App() {
           <Route path="/home" element={<AuthGuard isLoggedIn={isLoggedIn}><Home /></AuthGuard>} />
           <Route path="/games" element={<AuthGuard isLoggedIn={isLoggedIn}><Games /></AuthGuard>} />
           <Route path="/resources" element={<AuthGuard isLoggedIn={isLoggedIn}><Resources /></AuthGuard>} />
-          <Route path="/profile" element={<AuthGuard isLoggedIn={isLoggedIn}><Profile /></AuthGuard>} />
+          <Route path="/profile" element={<AuthGuard isLoggedIn={isLoggedIn}><Profile onLogout={handleLogout} /></AuthGuard>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
