@@ -3,7 +3,6 @@ import UserChip from './UserChip';
 import { currentUser } from '../data/mock';
 
 const tabs = [
-  { path: '/', label: 'Inicio' },
   { path: '/games', label: 'Minijuegos' },
   { path: '/resources', label: 'Recursos' },
 ];
@@ -13,7 +12,7 @@ export default function Navbar() {
   return (
     <header aria-label="Navegación principal">
       <nav className="xp-nav">
-        <div className="xp-logo">XP<span>Words</span></div>
+        <Link to="/" className="xp-logo" style={{ textDecoration: 'none' }}>XP<span>Words</span></Link>
         {tabs.map(t => (
           <Link
             key={t.path}
