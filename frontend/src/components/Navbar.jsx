@@ -12,7 +12,7 @@ export default function Navbar() {
   return (
     <header aria-label="Navegación principal">
       <nav className="xp-nav">
-        <Link to="/" className="xp-logo" style={{ textDecoration: 'none' }}>XP<span>Words</span></Link>
+        <Link to="/home" className="xp-logo" style={{ textDecoration: 'none' }}>XP<span>Words</span></Link>
         {tabs.map(t => (
           <Link
             key={t.path}
