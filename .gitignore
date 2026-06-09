@@ -1,6 +1,10 @@
 node_modules/
 dist/
 dist-ssr
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
 build/
 .env
 *.db
@@ -8,6 +12,7 @@ build/
 .DS_Store
 .vscode/
 .idea/
+HELP.md
 logs
 *.log
 npm-debug.log*
@@ -21,3 +26,17 @@ lerna-debug.log*
 *.njsproj
 *.sln
 *.sw?
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+*.iws
+*.iml
+*.ipr
+/nbproject/private/
+/nbbuild/
+/nbdist/
+/.nb-gradle/
