@@ -142,6 +142,18 @@ body{background:#0a0b0f;min-height:100vh;font-family:'Inter',sans-serif;color:#c
 
 .xp-streak{font-size:12px;color:#f59e0b;font-family:'Rajdhani',sans-serif;font-weight:600}
 
+/* LINKWORDS */
+.xp-link-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem}
+.xp-link-col{display:flex;flex-direction:column;gap:8px}
+.xp-link-item{display:flex;align-items:center;gap:8px;background:#13161f;border:1px solid #1c2030;border-radius:8px;padding:10px 12px;font-size:13px;color:#9ca3af;cursor:pointer;font-family:'Inter',sans-serif;text-align:left;transition:border-color .2s,background .2s}
+.xp-link-item:hover:not(:disabled){border-color:#2d4a40;color:#e2e8f0}
+.xp-link-item.selected{border-color:#6ee7b7;background:#0d2420;color:#6ee7b7}
+.xp-link-item.matched{border-color:#1d3a2f;background:#0a1812;color:#6ee7b7;cursor:default;opacity:.7}
+.xp-link-item.wrong{border-color:#f87171;background:#2a1010;color:#f87171}
+.xp-link-num{width:20px;height:20px;border-radius:50%;background:#1c2030;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#4b5563;flex-shrink:0}
+.xp-link-item.selected .xp-link-num{background:#0d2420;color:#6ee7b7}
+.xp-link-item.matched .xp-link-num{background:#1d3a2f;color:#6ee7b7}
+
 /* LANDING */
 .xp-landing{max-width:960px;margin:0 auto;padding:4rem 1rem}
 .xp-landing-hero{text-align:center;margin-bottom:4rem}

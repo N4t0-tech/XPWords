@@ -42,7 +42,7 @@ export const words = [
 
 export const games = [
   { id: 'wordsnap', icon: '🎯', title: 'WordSnap', desc: 'Adivina el significado antes de que se acabe el tiempo', xp: '+50 XP / ronda', diff: 'FÁCIL', diffClass: 'easy', available: true },
-  { id: 'linkwords', icon: '🔗', title: 'LinkWords', desc: 'Conecta palabras con sus definiciones a contrarreloj', xp: '+75 XP / ronda', diff: 'MEDIO', diffClass: 'med', available: false },
+  { id: 'linkwords', icon: '🔗', title: 'LinkWords', desc: 'Conecta palabras con sus definiciones a contrarreloj', xp: '+75 XP / match', diff: 'MEDIO', diffClass: 'med', available: true },
   { id: 'sentencefix', icon: '🧩', title: 'SentenceFix', desc: 'Ordena las palabras para formar la oración correcta', xp: '+100 XP / ronda', diff: 'DIFÍCIL', diffClass: 'hard', available: false },
   { id: 'listenup', icon: '👂', title: 'ListenUp', desc: 'Escucha la palabra y escríbela correctamente', xp: '+80 XP / ronda', diff: 'MEDIO', diffClass: 'med', available: false },
 ];
@@ -78,3 +78,9 @@ export const stats = [
   { value: '6', label: 'Minijuegos' },
   { value: '38', label: 'Recursos' },
 ];
+
+export const account = {
+  email: 'tu_acá@ejemplo.com',
+  discordConnected: true,
+  discordTag: '@usuario#1234',
+};
