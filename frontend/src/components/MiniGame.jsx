@@ -21,7 +21,6 @@ export default function MiniGame({ onClose }) {
   const [showTutorial, setShowTutorial] = useState(false);
 
   const answeredRef = useRef(false);
-  const livesRef = useRef(3);
   const intervalRef = useRef(null);
 
   const showToast = useCallback((msg) => {
@@ -32,10 +31,6 @@ export default function MiniGame({ onClose }) {
     answeredRef.current = answered;
   }, [answered]);
 
-  useEffect(() => {
-    livesRef.current = lives;
-  }, [lives]);
-
   const clearTimer = useCallback(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -43,23 +38,20 @@ export default function MiniGame({ onClose }) {
     }
   }, []);
 
-  const goToGameOver = useCallback(() => {
-    setStatus('gameover');
-  }, []);
+  useEffect(() => {
+    if (lives <= 0 && status === 'playing') {
+      const t = setTimeout(() => setStatus('gameover'), 800);
+      return () => clearTimeout(t);
+    }
+  }, [lives, status]);
 
   const handleTimeout = useCallback(() => {
     if (answeredRef.current) return;
     setAnswered(true);
     setStreak(0);
-    setLives(prev => {
-      const next = prev - 1;
-      if (next <= 0) {
-        setTimeout(goToGameOver, 800);
-      }
-      return next;
-    });
+    setLives(prev => prev - 1);
     showToast('¡Se acabó el tiempo!');
-  }, [showToast, goToGameOver]);
+  }, [showToast]);
 
   useEffect(() => {
     if (timeLeft === 0 && status === 'playing' && !answeredRef.current) {
@@ -103,13 +95,7 @@ export default function MiniGame({ onClose }) {
       }
     } else {
       setStreak(0);
-      setLives(prev => {
-        const next = prev - 1;
-        if (next <= 0) {
-          setTimeout(goToGameOver, 800);
-        }
-        return next;
-      });
+      setLives(prev => prev - 1);
       showToast('¡Respuesta incorrecta!');
     }
   }
@@ -160,8 +146,8 @@ export default function MiniGame({ onClose }) {
         <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎯</div>
         <div className="xp-mini-title">WordSnap</div>
         <p className="xp-mini-sub" style={{ marginBottom: '1.5rem' }}>
-          Adiviná el significado de cada palabra antes de que se acabe el tiempo.<br />
-          Tenés 3 vidas. ¡Cada 3 aciertos consecutivos ganás XP extra!
+          Adivina el significado de cada palabra antes de que se acabe el tiempo.<br />
+          Tienes 3 vidas. ¡Cada 3 aciertos consecutivos ganas XP extra!
         </p>
         <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
           <button className="xp-btn-primary" onClick={startGame}>COMENZAR</button>
@@ -199,7 +185,7 @@ export default function MiniGame({ onClose }) {
             <div className="xp-gm-stat-lbl">XP ganado</div>
           </div>
           <div className="xp-gm-stat">
-            <div className="xp-gm-stat-val">{Math.floor(index / 2) + 1}</div>
+            <div className="xp-gm-stat-val">{index + 1}</div>
             <div className="xp-gm-stat-lbl">Palabras</div>
           </div>
           <div className="xp-gm-stat">

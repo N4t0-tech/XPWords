@@ -41,10 +41,10 @@ export const words = [
 ];
 
 export const games = [
-  { id: 'wordsnap', icon: '🎯', title: 'WordSnap', desc: 'Adiviná el significado antes de que se acabe el tiempo', xp: '+50 XP / ronda', diff: 'FÁCIL', diffClass: 'easy', available: true },
-  { id: 'linkwords', icon: '🔗', title: 'LinkWords', desc: 'Conectá palabras con sus definiciones a contrarreloj', xp: '+75 XP / ronda', diff: 'MEDIO', diffClass: 'med', available: false },
-  { id: 'sentencefix', icon: '🧩', title: 'SentenceFix', desc: 'Ordená las palabras para formar la oración correcta', xp: '+100 XP / ronda', diff: 'DIFÍCIL', diffClass: 'hard', available: false },
-  { id: 'listenup', icon: '👂', title: 'ListenUp', desc: 'Escuchá la palabra y escribila correctamente', xp: '+80 XP / ronda', diff: 'MEDIO', diffClass: 'med', available: false },
+  { id: 'wordsnap', icon: '🎯', title: 'WordSnap', desc: 'Adivina el significado antes de que se acabe el tiempo', xp: '+50 XP / ronda', diff: 'FÁCIL', diffClass: 'easy', available: true },
+  { id: 'linkwords', icon: '🔗', title: 'LinkWords', desc: 'Conecta palabras con sus definiciones a contrarreloj', xp: '+75 XP / ronda', diff: 'MEDIO', diffClass: 'med', available: false },
+  { id: 'sentencefix', icon: '🧩', title: 'SentenceFix', desc: 'Ordena las palabras para formar la oración correcta', xp: '+100 XP / ronda', diff: 'DIFÍCIL', diffClass: 'hard', available: false },
+  { id: 'listenup', icon: '👂', title: 'ListenUp', desc: 'Escucha la palabra y escríbela correctamente', xp: '+80 XP / ronda', diff: 'MEDIO', diffClass: 'med', available: false },
 ];
 
 export const resources = [

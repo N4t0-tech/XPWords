@@ -9,17 +9,17 @@ const steps = [
   {
     icon: '⏱️',
     title: 'Corre contra el tiempo',
-    desc: 'Tenés 10 segundos para responder. La barra verde muestra cuánto tiempo te queda.',
+    desc: 'Tienes 10 segundos para responder. La barra verde muestra cuánto tiempo te queda.',
   },
   {
     icon: '♥',
     title: 'Cuidá tus vidas',
-    desc: 'Tenés 3 vidas. Perdés una al responder mal o si se acaba el tiempo. ¡3 fallos y se termina!',
+    desc: 'Tienes 3 vidas. Pierdes una al responder mal o si se acaba el tiempo. ¡3 fallos y se termina!',
   },
   {
     icon: '🔥',
     title: 'Armá rachas',
-    desc: 'Cada 3 aciertos consecutivos ganás +25 XP extra. ¡Intentá no fallar!',
+    desc: 'Cada 3 aciertos consecutivos ganas +25 XP extra. ¡Intenta no fallar!',
   },
   {
     icon: '🏆',

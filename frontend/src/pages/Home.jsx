@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <div className="xp-body">
       <div className="xp-hero">
-        <div className="xp-hero-title">Subí de nivel<br />en <span>inglés</span></div>
+        <div className="xp-hero-title">Sube de nivel<br />en <span>inglés</span></div>
         <p className="xp-hero-sub">
           Clases, minijuegos y recursos para la comunidad del servidor.<br />
           Cada clase y juego te da XP real. ¿Hasta qué nivel llegás?
