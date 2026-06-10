@@ -30,8 +30,12 @@ public class AuthService {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setName(request.getName());
-        if (request.getRole() != null) {
-            user.setRole(request.getRole());
+        if (request.getRole() != null && !request.getRole().isBlank()) {
+            try {
+                user.setRole(Role.valueOf(request.getRole().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                user.setRole(Role.STUDENT);
+            }
         }
 
         user = userRepository.save(user);
