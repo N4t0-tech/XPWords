@@ -1,17 +1,22 @@
 const iconMap = {
-  class: 'school',
-  game: 'device-gamepad-2',
-  res: 'cards',
+  GAME: 'device-gamepad-2',
+  LESSON: 'school',
+  RESOURCE: 'cards',
+  BADGE: 'award',
 };
 
 export default function HistoryRow({ item }) {
+  const source = item.source || 'GAME';
+  const icon = iconMap[source] || 'circle';
+  const desc = item.description || `${source} - ${item.amount} XP`;
+
   return (
     <div className="xp-hist-row">
-      <div className={`xp-hist-icon ${item.icon}`}>
-        <i className={`ti ti-${iconMap[item.icon] || 'circle'}`} aria-hidden="true" />
+      <div className={`xp-hist-icon ${source.toLowerCase()}`}>
+        <i className={`ti ti-${icon}`} aria-hidden="true" />
       </div>
-      <div className="xp-hist-desc" dangerouslySetInnerHTML={{ __html: item.desc }} />
-      <div className="xp-hist-xp">{item.xp}</div>
+      <div className="xp-hist-desc">{desc}</div>
+      <div className="xp-hist-xp">+{item.amount}</div>
     </div>
   );
 }

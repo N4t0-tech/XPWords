@@ -1,28 +1,38 @@
+const COLORS = [
+  { color: '#eab308', bg: '#2a2510' },
+  { color: '#a1a1aa', bg: '#20202a' },
+  { color: '#d97746', bg: '#2a1e10' },
+  { color: '#06b6d4', bg: '#10202a' },
+  { color: '#10b981', bg: '#102a20' },
+];
+
+function getStyle(index) {
+  return COLORS[index % COLORS.length];
+}
+
+function getInitials(name) {
+  if (!name) return '?';
+  return name.split(' ').map(n => n[0]).join('');
+}
+
 export default function Leaderboard({ data }) {
   return (
     <div className="xp-leaderboard">
-      {data.map(row => (
-        <div key={row.rank} className="xp-lb-row" style={row.dimmed ? { opacity: '.5' } : undefined}>
-          <div className={`xp-lb-rank${row.color ? ` ${row.color}` : ''}`}>{row.rank}</div>
-          <div
-            className="xp-lb-av"
-            style={{
-              background: row.bg,
-              color: row.dimmed ? '#6b7280' : undefined,
-              fontSize: row.dimmed ? '11px' : undefined,
-            }}
-          >
-            {row.initials}
+      {data.map((row, i) => {
+        const style = getStyle(i);
+        const initials = row.initials || getInitials(row.name);
+        return (
+          <div key={row.rank || i} className="xp-lb-row">
+            <div className={`xp-lb-rank`} style={{ color: style.color }}>{row.rank}</div>
+            <div className="xp-lb-av" style={{ background: style.bg, color: style.color }}>
+              {initials}
+            </div>
+            <div className="xp-lb-name">{row.name}</div>
+            <div className="xp-lb-lvl">{row.level ? `LVL ${row.level}` : ''}</div>
+            <div className="xp-lb-xp">{row.xp ? `${row.xp} XP` : '—'}</div>
           </div>
-          <div className="xp-lb-name" style={row.dimmed ? { color: '#4b5563' } : undefined}>
-            {row.name}
-          </div>
-          <div className="xp-lb-lvl">{row.level ? `LVL ${row.level}` : ''}</div>
-          <div className="xp-lb-xp" style={row.dimmed ? { color: '#1c2030' } : undefined}>
-            {row.xp ? `${row.xp} XP` : '—'}
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { words } from '../data/mock';
+import { api } from '../api/client';
 import Toast from './Toast';
 import Tutorial from './Tutorial';
 
@@ -26,6 +26,7 @@ export default function LinkWords({ onClose }) {
   const [maxStreak, setMaxStreak] = useState(0);
   const [toast, setToast] = useState({ show: false, msg: '' });
   const [showTutorial, setShowTutorial] = useState(false);
+  const [words, setWords] = useState([]);
 
   const [pairs, setPairs] = useState([]);
   const [shuffledWords, setShuffledWords] = useState([]);
@@ -41,6 +42,7 @@ export default function LinkWords({ onClose }) {
   const usedIndices = useRef(new Set());
   const timerRef = useRef(null);
   const streakRef = useRef(0);
+  const scoreSubmitted = useRef(false);
 
   const showToast = useCallback((msg) => setToast({ show: true, msg }), []);
 
@@ -102,6 +104,26 @@ export default function LinkWords({ onClose }) {
   }, [timeLeft, status, roundStarted, matched.size]);
 
   useEffect(() => {
+    api.get('/words').then(data => {
+      const parsed = data.map(w => ({
+        ...w,
+        options: typeof w.options === 'string' ? JSON.parse(w.options) : w.options,
+        correct: w.correctIndex,
+      }));
+      setWords(parsed);
+    }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (status === 'gameover' && !scoreSubmitted.current) {
+      scoreSubmitted.current = true;
+      api.post('/games/score', { gameType: 'linkwords', score, streak: maxStreak, round })
+        .then(() => window.dispatchEvent(new Event('user-updated')))
+        .catch(() => {});
+    }
+  }, [status]);
+
+  useEffect(() => {
     return () => clearTimer();
   }, []);
 
@@ -144,13 +166,11 @@ export default function LinkWords({ onClose }) {
       setWrongWord(wordIdx);
       setStreak(0);
       setRoundErrors(e => e + 1);
-      setLives(prev => {
-        const next = prev - 1;
-        if (next <= 0) {
-          setTimeout(() => setStatus('gameover'), 600);
-        }
-        return next;
-      });
+      const nextLives = lives - 1;
+      setLives(nextLives);
+      if (nextLives <= 0) {
+        setTimeout(() => setStatus('gameover'), 600);
+      }
       showToast('¡No coinciden!');
       setTimeout(() => {
         setWrongDef(null);
@@ -161,6 +181,7 @@ export default function LinkWords({ onClose }) {
   }
 
   function startGame() {
+    if (words.length === 0) return;
     usedIndices.current.clear();
     setStatus('playing');
     setRound(1);
@@ -173,6 +194,7 @@ export default function LinkWords({ onClose }) {
   }
 
   function retry() {
+    scoreSubmitted.current = false;
     setStatus('welcome');
     clearTimer();
   }
@@ -249,7 +271,7 @@ const linkSteps = [
             <span key={i} className={`xp-heart${alive ? '' : ' lost'}`}>♥</span>
           ))}
         </div>
-        <div style={{ fontSize: '12px', color: '#6b7280', fontFamily: "'Rajdhani',sans-serif", fontWeight: 600 }}>
+        <div style={{ fontSize: '13px', color: '#6b7280', fontFamily: "'Rajdhani',sans-serif", fontWeight: 600 }}>
           Ronda {round}
         </div>
         <div className="xp-score-disp">Puntaje: <span>{score}</span></div>
@@ -259,7 +281,7 @@ const linkSteps = [
         <div className="xp-timer-fill" style={{ width: `${timerPct}%`, background: timeLeft <= 10 ? '#f87171' : '#6ee7b7' }} />
       </div>
 
-      <p style={{ fontSize: '12px', color: '#4b5563', marginBottom: '.8rem', textAlign: 'center' }}>
+      <p style={{ fontSize: '13px', color: '#4b5563', marginBottom: '.8rem', textAlign: 'center' }}>
         Selecciona una definición y luego su palabra en inglés
       </p>
 

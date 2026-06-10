@@ -1,10 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ResourceItem from '../components/ResourceItem';
 import SectionHeader from '../components/SectionHeader';
-import { resources, resourceCategories } from '../data/mock';
+import { api } from '../api/client';
 
 export default function Resources() {
   const [cat, setCat] = useState('Todos');
+  const [resources, setResources] = useState([]);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    api.get('/resources').then(setResources).catch(() => {});
+    api.get('/resources/categories').then(setCategories).catch(() => {});
+  }, []);
 
   const filtered = cat === 'Todos' ? resources : resources.filter(r => r.category === cat);
 
@@ -12,7 +19,7 @@ export default function Resources() {
     <div className="xp-body">
       <SectionHeader icon="books" label="RECURSOS" />
       <div className="xp-res-cats">
-        {resourceCategories.map(c => (
+        {categories.map(c => (
           <div
             key={c}
             className={`xp-res-cat${cat === c ? ' active' : ''}`}

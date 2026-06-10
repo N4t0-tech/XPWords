@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { words } from '../data/mock';
+import { api } from '../api/client';
 import Toast from './Toast';
 import Tutorial from './Tutorial';
 
@@ -19,9 +19,11 @@ export default function MiniGame({ onClose }) {
   const [timeLeft, setTimeLeft] = useState(TIMER_SECONDS);
   const [toast, setToast] = useState({ show: false, msg: '' });
   const [showTutorial, setShowTutorial] = useState(false);
+  const [words, setWords] = useState([]);
 
   const answeredRef = useRef(false);
   const intervalRef = useRef(null);
+  const scoreSubmitted = useRef(false);
 
   const showToast = useCallback((msg) => {
     setToast({ show: true, msg });
@@ -45,6 +47,15 @@ export default function MiniGame({ onClose }) {
     }
   }, [lives, status]);
 
+  useEffect(() => {
+    if (status === 'gameover' && !scoreSubmitted.current) {
+      scoreSubmitted.current = true;
+      api.post('/games/score', { gameType: 'wordsnap', score, streak: maxStreak, round: index + 1 })
+        .then(() => window.dispatchEvent(new Event('user-updated')))
+        .catch(() => {});
+    }
+  }, [status]);
+
   const handleTimeout = useCallback(() => {
     if (answeredRef.current) return;
     setAnswered(true);
@@ -58,6 +69,17 @@ export default function MiniGame({ onClose }) {
       handleTimeout();
     }
   }, [timeLeft, status, handleTimeout]);
+
+  useEffect(() => {
+    api.get('/words').then(data => {
+      const parsed = data.map(w => ({
+        ...w,
+        options: typeof w.options === 'string' ? JSON.parse(w.options) : w.options,
+        correct: w.correctIndex,
+      }));
+      setWords(parsed);
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     return () => clearTimer();
@@ -109,6 +131,7 @@ export default function MiniGame({ onClose }) {
   }
 
   function startGame() {
+    if (words.length === 0) return;
     setStatus('playing');
     setIndex(0);
     setScore(0);
@@ -121,11 +144,12 @@ export default function MiniGame({ onClose }) {
   }
 
   function retry() {
+    scoreSubmitted.current = false;
     setStatus('welcome');
     clearTimer();
   }
 
-  const w = words[index % words.length];
+  const w = words.length > 0 ? words[index % words.length] : { word: '', hint: '', options: [], correct: 0 };
   const timerPct = (timeLeft / TIMER_SECONDS) * 100;
   const hearts = Array.from({ length: 3 }, (_, i) => i < lives);
 

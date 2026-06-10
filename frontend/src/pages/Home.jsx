@@ -1,8 +1,25 @@
+import { useState, useEffect } from 'react';
 import Leaderboard from '../components/Leaderboard';
 import SectionHeader from '../components/SectionHeader';
-import { stats, leaderboard } from '../data/mock';
+import { api } from '../api/client';
 
 export default function Home() {
+  const [stats, setStats] = useState(null);
+  const [leaderboard, setLeaderboard] = useState([]);
+
+  useEffect(() => {
+    api.get('/stats').then(setStats).catch(() => {});
+    api.get('/leaderboard').then(setLeaderboard).catch(() => {});
+  }, []);
+
+  const statItems = stats
+    ? [
+        { value: stats.activeMembers, label: 'Miembros activos' },
+        { value: stats.games, label: 'Minijuegos' },
+        { value: stats.resources, label: 'Recursos' },
+      ]
+    : [];
+
   return (
     <div className="xp-body">
       <div className="xp-hero">
@@ -13,7 +30,7 @@ export default function Home() {
         </p>
       </div>
       <div className="xp-stats">
-        {stats.map(s => (
+        {statItems.map(s => (
           <div key={s.label} className="xp-stat">
             <div className="xp-stat-val">{s.value}</div>
             <div className="xp-stat-lbl">{s.label}</div>
