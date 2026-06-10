@@ -15,7 +15,7 @@ public class JwtTokenProvider {
     private final long expirationMs;
 
     public JwtTokenProvider(JwtConfig jwtConfig) {
-        this.key = Keys.hmacShaKeyFor(java.util.Base64.getDecoder().decode(jwtConfig.getSecret()));
+        this.key = Keys.hmacShaKeyFor(jwtConfig.getSecret().getBytes());
         this.expirationMs = jwtConfig.getExpirationMs();
     }
 
