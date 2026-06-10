@@ -24,6 +24,7 @@ public class AdminController {
                 .map(u -> new UserProfileResponse(
                         u.getId(), u.getName(), u.getEmail(),
                         u.getDiscordId(), u.getDiscordTag(),
+                        u.getDiscordAvatar(),
                         u.getLevel(), u.getXp(), u.getAvatarBg(),
                         u.getRole().name()))
                 .toList();

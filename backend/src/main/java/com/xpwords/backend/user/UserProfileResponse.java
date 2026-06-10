@@ -11,6 +11,7 @@ public class UserProfileResponse {
     private String email;
     private String discordId;
     private String discordTag;
+    private String discordAvatar;
     private int level;
     private int xp;
     private String avatarBg;

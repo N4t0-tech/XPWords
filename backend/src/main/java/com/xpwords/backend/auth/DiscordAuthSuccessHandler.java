@@ -53,6 +53,12 @@ public class DiscordAuthSuccessHandler implements AuthenticationSuccessHandler {
                 ? (String) attrs.get("username")
                 : attrs.get("username") + "#" + discriminator;
         String email = (String) attrs.get("email");
+        String avatarHash = (String) attrs.get("avatar");
+        String discordAvatar = null;
+        if (avatarHash != null) {
+            String ext = avatarHash.startsWith("a_") ? "gif" : "png";
+            discordAvatar = "https://cdn.discordapp.com/avatars/" + discordId + "/" + avatarHash + "." + ext;
+        }
         String globalName = (String) attrs.get("global_name");
         if (globalName == null) globalName = (String) attrs.get("username");
 
@@ -60,36 +66,40 @@ public class DiscordAuthSuccessHandler implements AuthenticationSuccessHandler {
         User user;
 
         if (existing.isPresent()) {
-            user = existing.get();
-            user.setDiscordTag(discordTag);
-            userRepository.save(user);
-        } else if (email != null) {
-            Optional<User> byEmail = userRepository.findByEmail(email);
-            if (byEmail.isPresent()) {
-                user = byEmail.get();
-                user.setDiscordId(discordId);
+                user = existing.get();
                 user.setDiscordTag(discordTag);
+                user.setDiscordAvatar(discordAvatar);
                 userRepository.save(user);
+            } else if (email != null) {
+                Optional<User> byEmail = userRepository.findByEmail(email);
+                if (byEmail.isPresent()) {
+                    user = byEmail.get();
+                    user.setDiscordId(discordId);
+                    user.setDiscordTag(discordTag);
+                    user.setDiscordAvatar(discordAvatar);
+                    userRepository.save(user);
+                } else {
+                    user = new User();
+                    user.setEmail(email != null ? email : discordId + "@discord.local");
+                    user.setName(globalName);
+                    user.setDiscordId(discordId);
+                    user.setDiscordTag(discordTag);
+                    user.setDiscordAvatar(discordAvatar);
+                    user.setPassword(generateRandomPassword());
+                    user.setRole(Role.STUDENT);
+                    user = userRepository.save(user);
+                }
             } else {
                 user = new User();
-                user.setEmail(email != null ? email : discordId + "@discord.local");
+                user.setEmail(discordId + "@discord.local");
                 user.setName(globalName);
                 user.setDiscordId(discordId);
                 user.setDiscordTag(discordTag);
+                user.setDiscordAvatar(discordAvatar);
                 user.setPassword(generateRandomPassword());
                 user.setRole(Role.STUDENT);
                 user = userRepository.save(user);
             }
-        } else {
-            user = new User();
-            user.setEmail(discordId + "@discord.local");
-            user.setName(globalName);
-            user.setDiscordId(discordId);
-            user.setDiscordTag(discordTag);
-            user.setPassword(generateRandomPassword());
-            user.setRole(Role.STUDENT);
-            user = userRepository.save(user);
-        }
 
         String token = jwtTokenProvider.generateToken(user.getId(), user.getRole().name());
         response.sendRedirect(frontendUrl + "/auth/callback?token=" + token);

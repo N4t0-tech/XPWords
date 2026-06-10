@@ -32,7 +32,10 @@ export default function ProfileCard({ user }) {
   return (
     <div className="xp-profile-card">
       <div className="xp-profile-top">
-        <div className="xp-profile-av" style={{ background: user.avatarBg }}>{initials}</div>
+        {user.discordAvatar
+          ? <img className="xp-profile-av xp-avatar-img" src={user.discordAvatar} alt="" />
+          : <div className="xp-profile-av" style={{ background: user.avatarBg }}>{initials}</div>
+        }
         <div>
           <div className="xp-profile-name">{user.name}</div>
           <div className="xp-profile-tag">{tag}</div>

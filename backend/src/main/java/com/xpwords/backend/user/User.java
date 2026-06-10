@@ -32,6 +32,9 @@ public class User {
     @Column(name = "discord_tag")
     private String discordTag;
 
+    @Column(name = "discord_avatar")
+    private String discordAvatar;
+
     @Column(nullable = false)
     private int level = 1;
 

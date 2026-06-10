@@ -119,10 +119,17 @@ public class DiscordLinkController {
             String discordTag = "0".equals(discriminator)
                     ? String.valueOf(discordUser.get("username"))
                     : discordUser.get("username") + "#" + discriminator;
+            Object avatarRaw = discordUser.get("avatar");
+            String discordAvatar = null;
+            if (avatarRaw instanceof String avatarHash && !avatarHash.isBlank()) {
+                String ext = avatarHash.startsWith("a_") ? "gif" : "png";
+                discordAvatar = "https://cdn.discordapp.com/avatars/" + discordId + "/" + avatarHash + "." + ext;
+            }
 
             String existingDiscordId = user.getDiscordId();
             user.setDiscordId(discordId);
             user.setDiscordTag(discordTag);
+            user.setDiscordAvatar(discordAvatar);
             userRepository.save(user);
 
             if (existingDiscordId != null) {

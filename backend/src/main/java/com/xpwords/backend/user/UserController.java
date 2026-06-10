@@ -30,6 +30,7 @@ public class UserController {
         return ResponseEntity.ok(new UserProfileResponse(
                 user.getId(), user.getName(), user.getEmail(),
                 user.getDiscordId(), user.getDiscordTag(),
+                user.getDiscordAvatar(),
                 user.getLevel(), user.getXp(), user.getAvatarBg(),
                 user.getRole().name()));
     }
@@ -41,6 +42,7 @@ public class UserController {
                 .map(u -> new UserProfileResponse(
                         u.getId(), u.getName(), u.getEmail(),
                         u.getDiscordId(), u.getDiscordTag(),
+                        u.getDiscordAvatar(),
                         u.getLevel(), u.getXp(), u.getAvatarBg(),
                         u.getRole().name()))
                 .toList();
@@ -67,6 +69,7 @@ public class UserController {
         return ResponseEntity.ok(new UserProfileResponse(
                 user.getId(), user.getName(), user.getEmail(),
                 user.getDiscordId(), user.getDiscordTag(),
+                user.getDiscordAvatar(),
                 user.getLevel(), user.getXp(), user.getAvatarBg(),
                 user.getRole().name()));
     }

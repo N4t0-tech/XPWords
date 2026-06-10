@@ -11,4 +11,5 @@ public class LeaderboardEntry {
     private int level;
     private int xp;
     private String avatarBg;
+    private String discordAvatar;
 }

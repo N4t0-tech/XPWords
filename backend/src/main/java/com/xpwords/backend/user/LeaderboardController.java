@@ -32,7 +32,8 @@ public class LeaderboardController {
                     u.getName(),
                     u.getLevel(),
                     u.getXp(),
-                    u.getAvatarBg()));
+                    u.getAvatarBg(),
+                    u.getDiscordAvatar()));
         }
         return ResponseEntity.ok(entries);
     }
