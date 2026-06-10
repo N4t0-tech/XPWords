@@ -30,11 +30,14 @@ public class AuthService {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setName(request.getName());
+        if (request.getRole() != null) {
+            user.setRole(request.getRole());
+        }
 
         user = userRepository.save(user);
 
-        String token = jwtTokenProvider.generateToken(user.getId());
-        return new AuthResponse(token, user.getId(), user.getName(), user.getEmail());
+        String token = jwtTokenProvider.generateToken(user.getId(), user.getRole().name(), request.isRememberMe());
+        return new AuthResponse(token, user.getId(), user.getName(), user.getEmail(), user.getRole().name());
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -45,7 +48,7 @@ public class AuthService {
             throw new BadCredentialsException("Email o contraseña incorrectos");
         }
 
-        String token = jwtTokenProvider.generateToken(user.getId());
-        return new AuthResponse(token, user.getId(), user.getName(), user.getEmail());
+        String token = jwtTokenProvider.generateToken(user.getId(), user.getRole().name(), request.isRememberMe());
+        return new AuthResponse(token, user.getId(), user.getName(), user.getEmail(), user.getRole().name());
     }
 }
