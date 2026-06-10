@@ -14,4 +14,5 @@ public class UserProfileResponse {
     private int level;
     private int xp;
     private String avatarBg;
+    private String role;
 }

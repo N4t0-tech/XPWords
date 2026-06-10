@@ -38,6 +38,10 @@ public class User {
     @Column(nullable = false)
     private int xp = 0;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private Role role = Role.STUDENT;
+
     @Column(name = "avatar_bg")
     private String avatarBg;
 
