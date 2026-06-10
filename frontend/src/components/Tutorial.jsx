@@ -45,7 +45,7 @@ export default function Tutorial({ steps, onClose, onStart }) {
 
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>{s[step].icon}</div>
           <div className="xp-mini-title" style={{ marginBottom: '.5rem' }}>{s[step].title}</div>
-          <p style={{ fontSize: '13px', color: '#9ca3af', lineHeight: 1.6, marginBottom: '1.5rem' }}>
+          <p style={{ fontSize: '14px', color: '#9ca3af', lineHeight: 1.6, marginBottom: '1.5rem' }}>
             {s[step].desc}
           </p>
 
