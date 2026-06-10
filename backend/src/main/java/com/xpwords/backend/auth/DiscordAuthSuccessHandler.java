@@ -6,6 +6,7 @@ import com.xpwords.backend.user.UserRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -24,13 +25,16 @@ public class DiscordAuthSuccessHandler implements AuthenticationSuccessHandler {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final String frontendUrl;
 
     public DiscordAuthSuccessHandler(UserRepository userRepository,
                                       JwtTokenProvider jwtTokenProvider,
-                                      PasswordEncoder passwordEncoder) {
+                                      PasswordEncoder passwordEncoder,
+                                      @Value("${app.frontend-url}") String frontendUrl) {
         this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.passwordEncoder = passwordEncoder;
+        this.frontendUrl = frontendUrl;
     }
 
     private String generateRandomPassword() {
@@ -88,6 +92,6 @@ public class DiscordAuthSuccessHandler implements AuthenticationSuccessHandler {
         }
 
         String token = jwtTokenProvider.generateToken(user.getId(), user.getRole().name());
-        response.sendRedirect("http://localhost:5173/auth/callback?token=" + token);
+        response.sendRedirect(frontendUrl + "/auth/callback?token=" + token);
     }
 }

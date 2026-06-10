@@ -1,0 +1,6 @@
+target/
+*.jar
+.DS_Store
+.git
+.gitignore
+*.md

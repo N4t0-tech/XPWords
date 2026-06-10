@@ -24,6 +24,8 @@ public class DiscordLinkController {
 
     private final UserRepository userRepository;
     private final RestTemplate restTemplate;
+    private final String backendUrl;
+    private final String frontendUrl;
 
     @Value("${spring.security.oauth2.client.registration.discord.client-id}")
     private String clientId;
@@ -35,9 +37,13 @@ public class DiscordLinkController {
     private static final String DISCORD_TOKEN_URL = "https://discord.com/api/oauth2/token";
     private static final String DISCORD_USER_URL = "https://discord.com/api/users/@me";
 
-    public DiscordLinkController(UserRepository userRepository, RestTemplate restTemplate) {
+    public DiscordLinkController(UserRepository userRepository, RestTemplate restTemplate,
+                                  @Value("${app.backend-url}") String backendUrl,
+                                  @Value("${app.frontend-url}") String frontendUrl) {
         this.userRepository = userRepository;
         this.restTemplate = restTemplate;
+        this.backendUrl = backendUrl;
+        this.frontendUrl = frontendUrl;
     }
 
     @GetMapping("/api/users/me/discord/link")
@@ -46,7 +52,7 @@ public class DiscordLinkController {
         String nonce = UUID.randomUUID().toString();
         linkStates.put(nonce, userId);
 
-        String redirectUri = "http://localhost:3001/api/auth/discord/callback";
+        String redirectUri = backendUrl + "/api/auth/discord/callback";
         String state = "link_" + nonce;
         String authorizeUrl = "https://discord.com/api/oauth2/authorize" +
                 "?client_id=" + clientId +
@@ -64,23 +70,23 @@ public class DiscordLinkController {
     public void discordCallback(@RequestParam String code,
                                  @RequestParam String state,
                                  HttpServletResponse response) throws IOException {
-        String frontendUrl = "http://localhost:5173/profile";
+        String profileUrl = frontendUrl + "/profile";
 
         if (!state.startsWith("link_")) {
-            response.sendRedirect(frontendUrl + "?discord=error");
+            response.sendRedirect(profileUrl + "?discord=error");
             return;
         }
 
         String nonce = state.substring(5);
         Long userId = linkStates.remove(nonce);
         if (userId == null) {
-            response.sendRedirect(frontendUrl + "?discord=error");
+            response.sendRedirect(profileUrl + "?discord=error");
             return;
         }
 
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
-            response.sendRedirect(frontendUrl + "?discord=error");
+            response.sendRedirect(profileUrl + "?discord=error");
             return;
         }
 
@@ -90,7 +96,7 @@ public class DiscordLinkController {
             body.add("client_secret", clientSecret);
             body.add("grant_type", "authorization_code");
             body.add("code", code);
-            body.add("redirect_uri", "http://localhost:3001/api/auth/discord/callback");
+            body.add("redirect_uri", backendUrl + "/api/auth/discord/callback");
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -120,12 +126,12 @@ public class DiscordLinkController {
             userRepository.save(user);
 
             if (existingDiscordId != null) {
-                response.sendRedirect(frontendUrl + "?discord=updated");
+                response.sendRedirect(profileUrl + "?discord=updated");
             } else {
-                response.sendRedirect(frontendUrl + "?discord=linked");
+                response.sendRedirect(profileUrl + "?discord=linked");
             }
         } catch (Exception e) {
-            response.sendRedirect(frontendUrl + "?discord=error");
+            response.sendRedirect(profileUrl + "?discord=error");
         }
     }
 }
