@@ -1,15 +1,28 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { api } from '../api/client';
 import Toast from './Toast';
 
-export default function ProfileSettings() {
-  const [name, setName] = useState('tú_acá');
-  const [email, setEmail] = useState('tu_acá@ejemplo.com');
+export default function ProfileSettings({ user }) {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [toast, setToast] = useState({ show: false, msg: '' });
 
-  function handleSave(e) {
+  useEffect(() => {
+    if (user) {
+      setName(user.name || '');
+      setEmail(user.email || '');
+    }
+  }, [user]);
+
+  async function handleSave(e) {
     e.preventDefault();
     if (!name.trim() || !email.trim()) return;
-    setToast({ show: true, msg: 'Cambios guardados (mock)' });
+    try {
+      await api.put('/users/me', { name, email });
+      setToast({ show: true, msg: 'Cambios guardados' });
+    } catch (err) {
+      setToast({ show: true, msg: err.message });
+    }
   }
 
   return (

@@ -1,32 +1,75 @@
 import { useState } from 'react';
+import { api, getAuthBaseUrl } from '../api/client';
 import ChangePasswordModal from './ChangePasswordModal';
+import SetPasswordModal from './SetPasswordModal';
 import DeleteAccountModal from './DeleteAccountModal';
 import Toast from './Toast';
 
-export default function AccountSettings({ onLogout }) {
+export default function AccountSettings({ user, onLogout }) {
   const [showChangePw, setShowChangePw] = useState(false);
+  const [showSetPw, setShowSetPw] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [toast, setToast] = useState({ show: false, msg: '' });
+  const discordTag = user?.discordTag || null;
+  const role = user?.role || 'STUDENT';
+
+  async function handleConnectDiscord() {
+    try {
+      const data = await api.get('/users/me/discord/link');
+      window.location.href = data.url;
+    } catch (err) {
+      setToast({ show: true, msg: err.message });
+    }
+  }
+
+  async function handleDisconnectDiscord() {
+    try {
+      await api.post('/auth/discord', {});
+      const u = await api.get('/users/me');
+      setToast({ show: true, msg: 'Discord desconectado' });
+    } catch (err) {
+      setToast({ show: true, msg: err.message });
+    }
+  }
 
   return (
     <div className="xp-settings-card">
       <div className="xp-section-hdr"><i className="ti ti-shield" aria-hidden="true" /><span>CUENTA</span></div>
 
       <div className="xp-settings-actions">
-        <button className="xp-settings-btn" onClick={() => setShowChangePw(true)}>
-          <i className="ti ti-lock" aria-hidden="true" />
-          Cambiar contraseña
-        </button>
-
         <div className="xp-settings-row">
           <div className="xp-settings-row-info">
-            <i className="ti ti-brand-discord" aria-hidden="true" style={{ color: '#5865f2' }} />
-            <span>Discord: <strong style={{ color: '#e2e8f0' }}>@usuario#1234</strong></span>
+            <i className="ti ti-badge" aria-hidden="true" style={{ color: '#a78bfa' }} />
+            <span>Rol: <strong className={`xp-role-badge xp-role-${role.toLowerCase()}`}>{role === 'STUDENT' ? 'Estudiante' : role === 'TEACHER' ? 'Profesor' : 'Moderador'}</strong></span>
           </div>
-          <button className="xp-settings-btn xp-settings-btn-sm" onClick={() => setToast({ show: true, msg: 'Discord desconectado (mock)' })}>
-            Desconectar
-          </button>
         </div>
+        {discordTag ? (
+          <button className="xp-settings-btn" onClick={() => setShowSetPw(true)}>
+            <i className="ti ti-lock" aria-hidden="true" />
+            Establecer contraseña
+          </button>
+        ) : (
+          <button className="xp-settings-btn" onClick={() => setShowChangePw(true)}>
+            <i className="ti ti-lock" aria-hidden="true" />
+            Cambiar contraseña
+          </button>
+        )}
+
+          <div className="xp-settings-row">
+            <div className="xp-settings-row-info">
+              <i className="ti ti-brand-discord" aria-hidden="true" style={{ color: '#5865f2' }} />
+              <span>Discord: <strong style={{ color: '#e2e8f0' }}>{discordTag || 'No conectado'}</strong></span>
+            </div>
+            {discordTag ? (
+              <button className="xp-settings-btn xp-settings-btn-sm" onClick={handleDisconnectDiscord}>
+                Desconectar
+              </button>
+            ) : (
+              <button className="xp-settings-btn xp-settings-btn-sm" onClick={handleConnectDiscord}>
+                Conectar
+              </button>
+            )}
+          </div>
 
         <button className="xp-settings-btn" onClick={onLogout}>
           <i className="ti ti-logout" aria-hidden="true" />
@@ -41,16 +84,22 @@ export default function AccountSettings({ onLogout }) {
         </button>
       </div>
 
+      {showSetPw && (
+        <SetPasswordModal
+          onClose={() => setShowSetPw(false)}
+          onDone={() => { setShowSetPw(false); setToast({ show: true, msg: 'Contraseña establecida' }); }}
+        />
+      )}
       {showChangePw && (
         <ChangePasswordModal
           onClose={() => setShowChangePw(false)}
-          onDone={() => { setShowChangePw(false); setToast({ show: true, msg: 'Contraseña cambiada (mock)' }); }}
+          onDone={() => { setShowChangePw(false); setToast({ show: true, msg: 'Contraseña actualizada' }); }}
         />
       )}
       {showDelete && (
         <DeleteAccountModal
           onClose={() => setShowDelete(false)}
-          onDone={() => { setShowDelete(false); setToast({ show: true, msg: 'Cuenta eliminada (mock)' }); }}
+          onDone={() => { setShowDelete(false); onLogout(); }}
         />
       )}
       <Toast message={toast.msg} show={toast.show} onClose={() => setToast({ show: false, msg: '' })} />
