@@ -24,9 +24,10 @@ export default function Leaderboard({ data }) {
         return (
           <div key={row.rank || i} className="xp-lb-row">
             <div className={`xp-lb-rank`} style={{ color: style.color }}>{row.rank}</div>
-            <div className="xp-lb-av" style={{ background: style.bg, color: style.color }}>
-              {initials}
-            </div>
+            {row.discordAvatar
+              ? <img className="xp-lb-av xp-lb-av-img" src={row.discordAvatar} alt="" />
+              : <div className="xp-lb-av" style={{ background: style.bg, color: style.color }}>{initials}</div>
+            }
             <div className="xp-lb-name">{row.name}</div>
             <div className="xp-lb-lvl">{row.level ? `LVL ${row.level}` : ''}</div>
             <div className="xp-lb-xp">{row.xp ? `${row.xp} XP` : '—'}</div>
