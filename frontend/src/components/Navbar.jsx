@@ -1,14 +1,23 @@
 import { Link, useLocation } from 'react-router-dom';
 import UserChip from './UserChip';
-import { currentUser } from '../data/mock';
 
-const tabs = [
-  { path: '/games', label: 'Minijuegos' },
-  { path: '/resources', label: 'Recursos' },
+const teacherTabs = [
+  { path: '/teacher/resources', label: 'Recursos' },
+  { path: '/teacher/classes', label: 'Clases' },
+  { path: '/teacher/requests', label: 'Solicitudes' },
 ];
 
-export default function Navbar() {
+const studentTabs = [
+  { path: '/games', label: 'Minijuegos' },
+  { path: '/resources', label: 'Recursos' },
+  { path: '/requests', label: 'Solicitudes' },
+];
+
+export default function Navbar({ user, viewMode, onToggleView }) {
   const { pathname } = useLocation();
+  const isTeacherView = viewMode === 'teacher';
+  const tabs = isTeacherView ? teacherTabs : studentTabs;
+
   return (
     <header aria-label="Navegación principal">
       <nav className="xp-nav">
@@ -17,13 +26,26 @@ export default function Navbar() {
           <Link
             key={t.path}
             to={t.path}
-            className={`xp-nav-btn${pathname === t.path ? ' active' : ''}`}
+            className={`xp-nav-btn${pathname === t.path || pathname.startsWith(t.path) ? ' active' : ''}`}
           >
             {t.label}
           </Link>
         ))}
+        {user?.role === 'MODERATOR' && (
+          <button
+            className="xp-view-toggle"
+            onClick={onToggleView}
+            title={isTeacherView ? 'Cambiar a vista estudiante' : 'Cambiar a vista profesor'}
+          >
+            <span className={`xp-view-opt${isTeacherView ? ' active' : ''}`}>Profe</span>
+            <span className="xp-view-switch">
+              <span className={`xp-view-knob${isTeacherView ? '' : ' right'}`} />
+            </span>
+            <span className={`xp-view-opt${!isTeacherView ? ' active' : ''}`}>Alumno</span>
+          </button>
+        )}
         <Link to="/profile" style={{ textDecoration: 'none' }}>
-          <UserChip user={currentUser} />
+          <UserChip user={user} />
         </Link>
       </nav>
     </header>
