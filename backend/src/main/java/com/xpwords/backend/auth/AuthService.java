@@ -1,5 +1,6 @@
 package com.xpwords.backend.auth;
 
+import com.xpwords.backend.user.Role;
 import com.xpwords.backend.user.User;
 import com.xpwords.backend.user.UserRepository;
 import org.springframework.security.authentication.BadCredentialsException;
