@@ -31,6 +31,10 @@ async function request(endpoint, options = {}) {
     throw new Error('Sesión expirada');
   }
 
+  if (res.status === 429) {
+    throw new Error('Demasiados intentos. Espera un momento.');
+  }
+
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error || err.message || `Error ${res.status}`);

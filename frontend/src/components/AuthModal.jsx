@@ -5,22 +5,35 @@ export default function AuthModal({ mode, onClose, onLogin }) {
   const [tab, setTab] = useState(mode || 'login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [username, setUsername] = useState('');
   const [role, setRole] = useState('STUDENT');
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  function validate() {
+    if (!email || !password) {
+      return 'Todos los campos son obligatorios';
+    }
+    if (tab === 'register') {
+      if (!username) return 'Todos los campos son obligatorios';
+      if (username.length < 2) return 'El nombre debe tener al menos 2 caracteres';
+      if (password.length < 6) return 'La contraseña debe tener al menos 6 caracteres';
+      if (password !== confirmPassword) return 'Las contraseñas no coinciden';
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return 'Email no válido';
+    return null;
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
 
-    if (!email || !password) {
-      setError('Todos los campos son obligatorios');
-      return;
-    }
-    if (tab === 'register' && !username) {
-      setError('Todos los campos son obligatorios');
+    const validationError = validate();
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
@@ -111,6 +124,19 @@ export default function AuthModal({ mode, onClose, onLogin }) {
               onChange={e => setPassword(e.target.value)}
             />
           </div>
+
+          {tab === 'register' && (
+            <div className="xp-modal-field">
+              <label htmlFor="auth-confirm">Confirmar contraseña</label>
+              <input
+                id="auth-confirm"
+                type="password"
+                placeholder="••••••••"
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
+              />
+            </div>
+          )}
 
           <div className="xp-modal-field xp-remember-row">
             <label className="xp-checkbox-label">
