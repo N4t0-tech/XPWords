@@ -2,6 +2,8 @@ package com.xpwords.backend.user;
 
 import com.xpwords.backend.common.ErrorResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,6 +43,24 @@ public class AdminController {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long currentUserId = Long.valueOf(auth.getName());
+        if (currentUserId.equals(id)) {
+            return ResponseEntity.status(403).body(new ErrorResponse("No puedes cambiar tu propio rol"));
+        }
+
+        boolean isTeacher = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_TEACHER"));
+
+        if (isTeacher) {
+            if (user.getRole() == Role.MODERATOR) {
+                return ResponseEntity.status(403).body(new ErrorResponse("No puedes modificar un MODERATOR"));
+            }
+            if (newRole.equalsIgnoreCase("MODERATOR")) {
+                return ResponseEntity.status(403).body(new ErrorResponse("No puedes asignar rol MODERATOR"));
+            }
+        }
 
         try {
             user.setRole(Role.valueOf(newRole.toUpperCase()));

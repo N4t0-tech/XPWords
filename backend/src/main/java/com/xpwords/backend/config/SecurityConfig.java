@@ -61,7 +61,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/badges/assign").hasAnyRole("TEACHER", "MODERATOR")
                 .requestMatchers(HttpMethod.PUT, "/api/badges/**").hasAnyRole("TEACHER", "MODERATOR")
                 .requestMatchers(HttpMethod.DELETE, "/api/badges/**").hasAnyRole("TEACHER", "MODERATOR")
-                .requestMatchers("/api/admin/**").hasRole("MODERATOR")
+                .requestMatchers("/api/admin/**").hasAnyRole("TEACHER", "MODERATOR")
                 .anyRequest().authenticated()
             )
             .oauth2Login(oauth2 -> oauth2

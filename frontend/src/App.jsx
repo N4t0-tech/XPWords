@@ -15,6 +15,7 @@ import TeacherRequests from './pages/TeacherRequests';
 import TeacherQuizzes from './pages/TeacherQuizzes';
 import TeacherBadges from './pages/TeacherBadges';
 import TeacherStudents from './pages/TeacherStudents';
+import AdminUsers from './pages/AdminUsers';
 import StudentRequests from './pages/StudentRequests';
 import AuthCallback from './pages/AuthCallback';
 import { api } from './api/client';
@@ -119,6 +120,7 @@ export default function App() {
               <Route path="/teacher/quizzes" element={<AuthGuard isLoggedIn={isLoggedIn}><TeacherQuizzes /></AuthGuard>} />
               <Route path="/teacher/badges" element={<AuthGuard isLoggedIn={isLoggedIn}><TeacherBadges /></AuthGuard>} />
               <Route path="/teacher/students" element={<AuthGuard isLoggedIn={isLoggedIn}><TeacherStudents /></AuthGuard>} />
+              <Route path="/teacher/admin" element={<AuthGuard isLoggedIn={isLoggedIn}><AdminUsers user={user} /></AuthGuard>} />
               <Route path="/teacher/requests" element={<AuthGuard isLoggedIn={isLoggedIn}><TeacherRequests /></AuthGuard>} />
             </>
           )}

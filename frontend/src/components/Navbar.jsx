@@ -8,6 +8,7 @@ const teacherTabs = [
   { path: '/teacher/resources', label: 'Recursos' },
   { path: '/teacher/classes', label: 'Clases' },
   { path: '/teacher/requests', label: 'Solicitudes' },
+  { path: '/teacher/admin', label: 'Admin' },
 ];
 
 const studentTabs = [
