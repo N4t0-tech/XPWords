@@ -7,7 +7,6 @@ export default function AuthModal({ mode, onClose, onLogin }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [username, setUsername] = useState('');
-  const [role, setRole] = useState('STUDENT');
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -42,7 +41,7 @@ export default function AuthModal({ mode, onClose, onLogin }) {
       const endpoint = tab === 'login' ? '/auth/login' : '/auth/register';
       const body = tab === 'login'
         ? { email, password, rememberMe }
-        : { email, password, name: username, role, rememberMe };
+        : { email, password, name: username, rememberMe };
       const data = await api.post(endpoint, body);
       await onLogin(data.token);
     } catch (err) {
@@ -88,17 +87,6 @@ export default function AuthModal({ mode, onClose, onLogin }) {
                   value={username}
                   onChange={e => setUsername(e.target.value)}
                 />
-              </div>
-              <div className="xp-modal-field">
-                <label htmlFor="auth-role">Rol</label>
-                <select
-                  id="auth-role"
-                  value={role}
-                  onChange={e => setRole(e.target.value)}
-                >
-                  <option value="STUDENT">Estudiante</option>
-                  <option value="TEACHER">Profesor</option>
-                </select>
               </div>
             </>
           )}
