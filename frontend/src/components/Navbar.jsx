@@ -3,7 +3,7 @@ import UserChip from './UserChip';
 
 const teacherTabs = [
   { path: '/teacher/students', label: 'Alumnos' },
-  { path: '/teacher/words', label: 'Palabras' },
+  { path: '/teacher/quizzes', label: 'Minijuegos' },
   { path: '/teacher/badges', label: 'Medallas' },
   { path: '/teacher/resources', label: 'Recursos' },
   { path: '/teacher/classes', label: 'Clases' },
