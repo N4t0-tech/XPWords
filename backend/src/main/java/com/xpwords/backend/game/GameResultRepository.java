@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface GameResultRepository extends JpaRepository<GameResult, Long> {
     List<GameResult> findByUserIdOrderByCreatedAtDesc(Long userId);
+    long countByUserId(Long userId);
 }

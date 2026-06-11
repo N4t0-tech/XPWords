@@ -1,5 +1,6 @@
 package com.xpwords.backend.classes;
 
+import com.xpwords.backend.badge.BadgeService;
 import com.xpwords.backend.common.ErrorResponse;
 import com.xpwords.backend.user.User;
 import com.xpwords.backend.user.UserRepository;
@@ -17,11 +18,14 @@ public class ClassRequestController {
 
     private final ClassRequestRepository classRequestRepository;
     private final UserRepository userRepository;
+    private final BadgeService badgeService;
 
     public ClassRequestController(ClassRequestRepository classRequestRepository,
-                                   UserRepository userRepository) {
+                                   UserRepository userRepository,
+                                   BadgeService badgeService) {
         this.classRequestRepository = classRequestRepository;
         this.userRepository = userRepository;
+        this.badgeService = badgeService;
     }
 
     @GetMapping
@@ -88,6 +92,11 @@ public class ClassRequestController {
 
         request.setStatus(status);
         classRequestRepository.save(request);
+
+        if ("APPROVED".equals(status)) {
+            badgeService.assignBadgeIfNotOwned(request.getStudentId(), "Primera clase");
+        }
+
         return ResponseEntity.ok(new ErrorResponse("Solicitud " + (status.equals("APPROVED") ? "aprobada" : "rechazada")));
     }
 }
