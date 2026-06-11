@@ -7,38 +7,61 @@ export default function TeacherWords() {
   const [words, setWords] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({ word: '', hint: '', options: '[]', correctIndex: 0 });
+  const [form, setForm] = useState({ word: '', hint: '', optA: '', optB: '', optC: '', optD: '', correctIndex: 0 });
   const [toast, setToast] = useState({ show: false, msg: '' });
 
   useEffect(() => {
     api.get('/words').then(setWords).catch(() => {});
   }, []);
 
+  function parseOptions(str) {
+    try { return JSON.parse(str); } catch { return []; }
+  }
+
+  function toForm(w) {
+    const opts = parseOptions(w.options);
+    return {
+      word: w.word,
+      hint: w.hint,
+      optA: opts[0] || '',
+      optB: opts[1] || '',
+      optC: opts[2] || '',
+      optD: opts[3] || '',
+      correctIndex: w.correctIndex,
+    };
+  }
+
   function openCreate() {
     setEditing(null);
-    setForm({ word: '', hint: '', options: '["","","",""]', correctIndex: 0 });
+    setForm({ word: '', hint: '', optA: '', optB: '', optC: '', optD: '', correctIndex: 0 });
     setShowForm(true);
   }
 
   function openEdit(w) {
     setEditing(w);
-    setForm({ word: w.word, hint: w.hint, options: w.options, correctIndex: w.correctIndex });
+    setForm(toForm(w));
     setShowForm(true);
   }
 
-  function parseOptions(str) {
-    try { return JSON.parse(str); } catch { return []; }
+  function buildPayload(f) {
+    return {
+      word: f.word,
+      hint: f.hint,
+      options: JSON.stringify([f.optA, f.optB, f.optC, f.optD]),
+      correctIndex: f.correctIndex,
+    };
   }
 
   async function handleSave(e) {
     e.preventDefault();
     try {
+      const payload = buildPayload(form);
       if (editing) {
-        const updated = await api.put(`/words/${editing.id}`, form);
+        const updated = await api.put(`/words/${editing.id}`, payload);
         setWords(prev => prev.map(w => w.id === editing.id ? updated : w));
         setToast({ show: true, msg: 'Palabra actualizada' });
       } else {
-        const created = await api.post('/words', form);
+        const created = await api.post('/words', payload);
         setWords(prev => [...prev, created]);
         setToast({ show: true, msg: 'Palabra creada' });
       }
@@ -58,6 +81,8 @@ export default function TeacherWords() {
     }
   }
 
+  const LETTERS = ['A', 'B', 'C', 'D'];
+
   return (
     <div className="xp-body">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
@@ -75,7 +100,7 @@ export default function TeacherWords() {
                 <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '2px' }}>{w.hint}</div>
                 <div style={{ fontSize: '12px', color: '#4b5563', marginTop: '4px' }}>
                   {opts.map((o, i) => (
-                    <span key={i} style={{ background: i === w.correctIndex ? '#1a3a1a' : '#13161f', padding: '2px 8px', borderRadius: '4px', marginRight: '4px', color: i === w.correctIndex ? '#4ade80' : '#9ca3af' }}>{o}</span>
+                    <span key={i} style={{ background: i === w.correctIndex ? '#1a3a1a' : '#13161f', padding: '2px 8px', borderRadius: '4px', marginRight: '4px', color: i === w.correctIndex ? '#4ade80' : '#9ca3af' }}>{LETTERS[i]}) {o}</span>
                   ))}
                 </div>
               </div>
@@ -94,7 +119,7 @@ export default function TeacherWords() {
 
       {showForm && (
         <div className="xp-modal-overlay" onClick={() => setShowForm(false)}>
-          <div className="xp-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '520px' }}>
+          <div className="xp-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px' }}>
             <button className="xp-modal-close" onClick={() => setShowForm(false)}>✕</button>
             <div className="xp-section-hdr" style={{ marginBottom: '1.2rem' }}>
               <i className="ti ti-vocabulary" aria-hidden="true" />
@@ -110,12 +135,29 @@ export default function TeacherWords() {
                 <input type="text" value={form.hint} onChange={e => setForm(p => ({ ...p, hint: e.target.value }))} required />
               </div>
               <div className="xp-modal-field">
-                <label>Opciones (JSON array)</label>
-                <textarea rows={3} value={form.options} onChange={e => setForm(p => ({ ...p, options: e.target.value }))} style={{ background: '#13161f', border: '1px solid #1c2030', borderRadius: '6px', padding: '8px', color: '#e2e8f0', width: '100%', fontFamily: 'monospace', fontSize: '13px', resize: 'vertical' }} required />
-              </div>
-              <div className="xp-modal-field">
-                <label>Índice correcto ({parseOptions(form.options).length - 1} máximo)</label>
-                <input type="number" min={0} max={parseOptions(form.options).length - 1} value={form.correctIndex} onChange={e => setForm(p => ({ ...p, correctIndex: parseInt(e.target.value) || 0 }))} required />
+                <label>Opciones</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  {LETTERS.map((l, i) => (
+                    <label key={l} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '4px 0' }}>
+                      <input
+                        type="radio"
+                        name="correctIndex"
+                        checked={form.correctIndex === i}
+                        onChange={() => setForm(p => ({ ...p, correctIndex: i }))}
+                        style={{ accentColor: '#4ade80' }}
+                      />
+                      <span style={{ color: form.correctIndex === i ? '#4ade80' : '#9ca3af', fontWeight: 600, width: '16px' }}>{l}</span>
+                      <input
+                        type="text"
+                        value={form[`opt${l}`]}
+                        onChange={e => setForm(p => ({ ...p, [`opt${l}`]: e.target.value }))}
+                        placeholder={`Opción ${l}`}
+                        required
+                        style={{ flex: 1, background: '#13161f', border: form.correctIndex === i ? '1px solid #4ade80' : '1px solid #1c2030', borderRadius: '6px', padding: '8px', color: '#e2e8f0' }}
+                      />
+                    </label>
+                  ))}
+                </div>
               </div>
               <button type="submit" className="xp-btn-primary" style={{ width: '100%' }}>
                 {editing ? 'GUARDAR CAMBIOS' : 'CREAR PALABRA'}
