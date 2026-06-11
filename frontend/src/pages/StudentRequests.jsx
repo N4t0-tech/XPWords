@@ -26,7 +26,7 @@ export default function StudentRequests({ user }) {
   const [toast, setToast] = useState({ show: false, msg: '' });
 
   useEffect(() => {
-    api.get('/class-requests').then(setRequests).catch(() => {});
+    api.get('/class-requests?as=student').then(setRequests).catch(() => {});
     api.get('/users/teachers').then(setTeachers).catch(() => {});
   }, []);
 
@@ -42,7 +42,7 @@ export default function StudentRequests({ user }) {
         requestedDate: requestedDate ? new Date(requestedDate).toISOString() : undefined,
       };
       await api.post('/class-requests', body);
-      const updated = await api.get('/class-requests');
+      const updated = await api.get('/class-requests?as=student');
       setRequests(updated);
       setTopic('');
       setMessage('');

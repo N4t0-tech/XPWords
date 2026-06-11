@@ -20,7 +20,7 @@ export default function TeacherRequests() {
   const [toast, setToast] = useState({ show: false, msg: '' });
 
   useEffect(() => {
-    api.get('/class-requests').then(setRequests).catch(() => {});
+    api.get('/class-requests?as=teacher').then(setRequests).catch(() => {});
   }, []);
 
   async function handleStatus(id, status) {

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Map;
 
 @RestController
@@ -29,17 +30,24 @@ public class ClassRequestController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ClassRequestResponse>> getMyRequests(Authentication auth) {
+    public ResponseEntity<List<ClassRequestResponse>> getMyRequests(Authentication auth,
+                                                                     @RequestParam(name = "as", required = false) String as) {
         Long userId = (Long) auth.getPrincipal();
-        String role = auth.getAuthorities().stream()
-                .findFirst().map(a -> a.getAuthority().replace("ROLE_", ""))
-                .orElse("STUDENT");
 
         List<ClassRequest> requests;
-        if ("STUDENT".equals(role)) {
+        if ("student".equals(as)) {
             requests = classRequestRepository.findByStudentIdOrderByCreatedAtDesc(userId);
-        } else {
+        } else if ("teacher".equals(as)) {
             requests = classRequestRepository.findByTeacherIdOrderByCreatedAtDesc(userId);
+        } else {
+            String role = auth.getAuthorities().stream()
+                    .findFirst().map(a -> a.getAuthority().replace("ROLE_", ""))
+                    .orElse("STUDENT");
+            if ("STUDENT".equals(role)) {
+                requests = classRequestRepository.findByStudentIdOrderByCreatedAtDesc(userId);
+            } else {
+                requests = classRequestRepository.findByTeacherIdOrderByCreatedAtDesc(userId);
+            }
         }
 
         List<ClassRequestResponse> responses = requests.stream()
