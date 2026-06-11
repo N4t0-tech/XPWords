@@ -9,8 +9,8 @@ import SectionHeader from '../components/SectionHeader';
 const games = [
   { id: 'wordsnap', icon: '🎯', title: 'WordSnap', desc: 'Adivina el significado antes de que se acabe el tiempo', xp: '+50 XP / ronda', diff: 'FÁCIL', diffClass: 'easy', available: true },
   { id: 'linkwords', icon: '🔗', title: 'LinkWords', desc: 'Conecta palabras con sus definiciones a contrarreloj', xp: '+75 XP / match', diff: 'MEDIO', diffClass: 'med', available: true },
-  { id: 'sentencefix', icon: '🧩', title: 'SentenceFix', desc: 'Ordena las palabras para formar la oración correcta', xp: '+100 XP / ronda', diff: 'DIFÍCIL', diffClass: 'hard', available: true },
   { id: 'listenup', icon: '👂', title: 'ListenUp', desc: 'Escucha la palabra y elegí la opción correcta', xp: '+80 XP / ronda', diff: 'MEDIO', diffClass: 'med', available: true },
+  { id: 'sentencefix', icon: '🧩', title: 'SentenceFix', desc: 'Ordena las palabras para formar la oración correcta', xp: '+100 XP / ronda', diff: 'DIFÍCIL', diffClass: 'hard', available: true },
 ];
 
 export default function Games() {
