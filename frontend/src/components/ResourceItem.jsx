@@ -5,7 +5,7 @@ const iconMap = {
   link: 'link',
 };
 
-export default function ResourceItem({ item }) {
+export default function ResourceItem({ item, actions }) {
   return (
     <div className="xp-res-item">
       <div className={`xp-res-thumb ${item.type}`}>
@@ -15,7 +15,7 @@ export default function ResourceItem({ item }) {
         <div className="xp-res-title">{item.title}</div>
         <div className="xp-res-meta">{item.category} · {item.meta}</div>
       </div>
-      <button className="xp-res-btn">{item.btn}</button>
+      {actions ? actions : <button className="xp-res-btn" disabled>{item.btn}</button>}
     </div>
   );
 }

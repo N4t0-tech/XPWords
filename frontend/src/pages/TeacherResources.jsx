@@ -64,17 +64,20 @@ export default function TeacherResources() {
 
       <div className="xp-res-list">
         {resources.map(r => (
-          <div key={r.id} style={{ position: 'relative' }}>
-            <ResourceItem item={r} />
-            <div style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', display: 'flex', gap: '6px' }}>
-              <button className="xp-btn-sm" onClick={() => openEdit(r)} style={{ background: '#13161f', border: '1px solid #1c2030', borderRadius: '6px', padding: '6px 12px', fontSize: '13px', color: '#9ca3af', cursor: 'pointer' }}>
-                <i className="ti ti-pencil" />
-              </button>
-              <button className="xp-btn-sm" onClick={() => handleDelete(r.id)} style={{ background: '#2a1010', border: '1px solid #3a1515', borderRadius: '6px', padding: '6px 12px', fontSize: '13px', color: '#f87171', cursor: 'pointer' }}>
-                <i className="ti ti-trash" />
-              </button>
-            </div>
-          </div>
+          <ResourceItem
+            key={r.id}
+            item={r}
+            actions={
+              <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+                <button className="xp-btn-sm" onClick={() => openEdit(r)} style={{ background: '#13161f', border: '1px solid #1c2030', borderRadius: '6px', padding: '6px 12px', fontSize: '13px', color: '#9ca3af', cursor: 'pointer' }}>
+                  <i className="ti ti-pencil" />
+                </button>
+                <button className="xp-btn-sm" onClick={() => handleDelete(r.id)} style={{ background: '#2a1010', border: '1px solid #3a1515', borderRadius: '6px', padding: '6px 12px', fontSize: '13px', color: '#f87171', cursor: 'pointer' }}>
+                  <i className="ti ti-trash" />
+                </button>
+              </div>
+            }
+          />
         ))}
       </div>
 
