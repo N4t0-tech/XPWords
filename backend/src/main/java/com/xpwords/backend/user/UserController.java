@@ -35,6 +35,20 @@ public class UserController {
                 user.getRole().name()));
     }
 
+    @GetMapping("/students")
+    public ResponseEntity<List<UserProfileResponse>> getStudents() {
+        List<User> students = userRepository.findByRole(Role.STUDENT);
+        List<UserProfileResponse> responses = students.stream()
+                .map(u -> new UserProfileResponse(
+                        u.getId(), u.getName(), u.getEmail(),
+                        u.getDiscordId(), u.getDiscordTag(),
+                        u.getDiscordAvatar(),
+                        u.getLevel(), u.getXp(), u.getAvatarBg(),
+                        u.getRole().name()))
+                .toList();
+        return ResponseEntity.ok(responses);
+    }
+
     @GetMapping("/teachers")
     public ResponseEntity<List<UserProfileResponse>> getTeachers() {
         List<User> teachers = userRepository.findByRole(Role.TEACHER);

@@ -2,6 +2,9 @@ import { Link, useLocation } from 'react-router-dom';
 import UserChip from './UserChip';
 
 const teacherTabs = [
+  { path: '/teacher/students', label: 'Alumnos' },
+  { path: '/teacher/words', label: 'Palabras' },
+  { path: '/teacher/badges', label: 'Medallas' },
   { path: '/teacher/resources', label: 'Recursos' },
   { path: '/teacher/classes', label: 'Clases' },
   { path: '/teacher/requests', label: 'Solicitudes' },
