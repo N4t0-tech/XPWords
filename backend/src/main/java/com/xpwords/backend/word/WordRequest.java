@@ -17,4 +17,7 @@ public class WordRequest {
 
     @NotNull
     private int correctIndex;
+
+    @NotBlank
+    private String gameType;
 }

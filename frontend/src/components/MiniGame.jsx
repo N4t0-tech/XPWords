@@ -71,7 +71,7 @@ export default function MiniGame({ onClose }) {
   }, [timeLeft, status, handleTimeout]);
 
   useEffect(() => {
-    api.get('/words').then(data => {
+    api.get('/words?gameType=wordsnap').then(data => {
       const parsed = data.map(w => ({
         ...w,
         options: typeof w.options === 'string' ? JSON.parse(w.options) : w.options,

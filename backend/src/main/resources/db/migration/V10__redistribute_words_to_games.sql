@@ -1,0 +1,1 @@
+UPDATE words SET game_type = 'linkwords' WHERE word IN ('RESILIENT', 'THRIVE', 'ELOQUENT', 'PERSIST', 'CUNNING', 'BENEATH', 'TO SEEK', 'TO GAZE', 'TO GRASP', 'SWIFT', 'TO FROWN', 'DREADFUL', 'TO MEND');

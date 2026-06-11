@@ -18,7 +18,10 @@ public class WordController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Word>> getWords() {
+    public ResponseEntity<List<Word>> getWords(@RequestParam(required = false) String gameType) {
+        if (gameType != null) {
+            return ResponseEntity.ok(wordRepository.findByGameType(gameType));
+        }
         return ResponseEntity.ok(wordRepository.findAll());
     }
 
@@ -29,6 +32,7 @@ public class WordController {
         word.setHint(request.getHint());
         word.setOptions(request.getOptions());
         word.setCorrectIndex(request.getCorrectIndex());
+        word.setGameType(request.getGameType());
         return ResponseEntity.status(HttpStatus.CREATED).body(wordRepository.save(word));
     }
 
@@ -40,6 +44,7 @@ public class WordController {
         word.setHint(request.getHint());
         word.setOptions(request.getOptions());
         word.setCorrectIndex(request.getCorrectIndex());
+        word.setGameType(request.getGameType());
         return ResponseEntity.ok(wordRepository.save(word));
     }
 

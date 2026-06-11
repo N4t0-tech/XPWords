@@ -27,4 +27,7 @@ public class Word {
 
     @Column(name = "correct_index", nullable = false)
     private int correctIndex;
+
+    @Column(name = "game_type", nullable = false, length = 20)
+    private String gameType = "wordsnap";
 }

@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS quiz_words;
+DROP TABLE IF EXISTS quizzes;

@@ -104,7 +104,7 @@ export default function LinkWords({ onClose }) {
   }, [timeLeft, status, roundStarted, matched.size]);
 
   useEffect(() => {
-    api.get('/words').then(data => {
+    api.get('/words?gameType=linkwords').then(data => {
       const parsed = data.map(w => ({
         ...w,
         options: typeof w.options === 'string' ? JSON.parse(w.options) : w.options,

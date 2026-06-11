@@ -1,0 +1,1 @@
+ALTER TABLE words ADD COLUMN game_type VARCHAR(20) NOT NULL DEFAULT 'wordsnap';
