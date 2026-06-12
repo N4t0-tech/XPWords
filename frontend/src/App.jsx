@@ -97,6 +97,7 @@ export default function App() {
     <BrowserRouter>
       <div className="xp">
         {isLoggedIn && <Navbar user={user} viewMode={effectiveView} onToggleView={handleToggleView} />}
+        <main className="xp-main">
         <Routes>
           <Route
             path="/auth/callback"
@@ -129,6 +130,7 @@ export default function App() {
           )}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </main>
       </div>
 
       {authMode && (
