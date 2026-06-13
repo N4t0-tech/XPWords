@@ -32,33 +32,33 @@ public class UserController {
                 user.getDiscordId(), user.getDiscordTag(),
                 user.getDiscordAvatar(),
                 user.getLevel(), user.getXp(), user.getAvatarBg(),
-                user.getRole().name()));
+                user.getRole().name(), user.isActive()));
     }
 
     @GetMapping("/students")
     public ResponseEntity<List<UserProfileResponse>> getStudents() {
-        List<User> students = userRepository.findByRole(Role.STUDENT);
+        List<User> students = userRepository.findByRoleAndActiveTrue(Role.STUDENT);
         List<UserProfileResponse> responses = students.stream()
                 .map(u -> new UserProfileResponse(
                         u.getId(), u.getName(), u.getEmail(),
                         u.getDiscordId(), u.getDiscordTag(),
                         u.getDiscordAvatar(),
                         u.getLevel(), u.getXp(), u.getAvatarBg(),
-                        u.getRole().name()))
+                        u.getRole().name(), u.isActive()))
                 .toList();
         return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/teachers")
     public ResponseEntity<List<UserProfileResponse>> getTeachers() {
-        List<User> teachers = userRepository.findByRole(Role.TEACHER);
+        List<User> teachers = userRepository.findByRoleAndActiveTrue(Role.TEACHER);
         List<UserProfileResponse> responses = teachers.stream()
                 .map(u -> new UserProfileResponse(
                         u.getId(), u.getName(), u.getEmail(),
                         u.getDiscordId(), u.getDiscordTag(),
                         u.getDiscordAvatar(),
                         u.getLevel(), u.getXp(), u.getAvatarBg(),
-                        u.getRole().name()))
+                        u.getRole().name(), u.isActive()))
                 .toList();
         return ResponseEntity.ok(responses);
     }
@@ -85,7 +85,7 @@ public class UserController {
                 user.getDiscordId(), user.getDiscordTag(),
                 user.getDiscordAvatar(),
                 user.getLevel(), user.getXp(), user.getAvatarBg(),
-                user.getRole().name()));
+                user.getRole().name(), user.isActive()));
     }
 
     @PutMapping("/me/set-password")
@@ -125,7 +125,10 @@ public class UserController {
     @DeleteMapping("/me")
     public ResponseEntity<ErrorResponse> deleteAccount(Authentication auth) {
         Long userId = (Long) auth.getPrincipal();
-        userRepository.deleteById(userId);
-        return ResponseEntity.ok(new ErrorResponse("Cuenta eliminada"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+        user.setActive(false);
+        userRepository.save(user);
+        return ResponseEntity.ok(new ErrorResponse("Cuenta desactivada"));
     }
 }

@@ -21,7 +21,7 @@ public class LeaderboardController {
 
     @GetMapping("/leaderboard")
     public ResponseEntity<List<LeaderboardEntry>> getLeaderboard() {
-        List<User> users = userRepository.findAllByOrderByXpDesc();
+        List<User> users = userRepository.findAllByActiveTrueOrderByXpDesc();
 
         AtomicInteger rank = new AtomicInteger(1);
         List<LeaderboardEntry> entries = new ArrayList<>();
@@ -39,7 +39,7 @@ public class LeaderboardController {
 
     @GetMapping("/stats")
     public ResponseEntity<?> getStats() {
-        long userCount = userRepository.count();
+        long userCount = userRepository.countByActiveTrue();
         return ResponseEntity.ok(java.util.Map.of(
                 "activeMembers", (int) userCount,
                 "games", 4,

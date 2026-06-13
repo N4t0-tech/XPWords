@@ -28,7 +28,7 @@ public class AdminController {
                         u.getDiscordId(), u.getDiscordTag(),
                         u.getDiscordAvatar(),
                         u.getLevel(), u.getXp(), u.getAvatarBg(),
-                        u.getRole().name()))
+                        u.getRole().name(), u.isActive()))
                 .toList();
         return ResponseEntity.ok(responses);
     }
@@ -70,5 +70,22 @@ public class AdminController {
 
         userRepository.save(user);
         return ResponseEntity.ok(new ErrorResponse("Rol actualizado"));
+    }
+
+    @PutMapping("/users/{id}/toggle-active")
+    public ResponseEntity<ErrorResponse> toggleActive(@PathVariable Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long currentUserId = Long.valueOf(auth.getName());
+        if (currentUserId.equals(id)) {
+            return ResponseEntity.status(403).body(new ErrorResponse("No puedes desactivarte a ti mismo"));
+        }
+
+        user.setActive(!user.isActive());
+        userRepository.save(user);
+        String msg = user.isActive() ? "Usuario reactivado" : "Usuario desactivado";
+        return ResponseEntity.ok(new ErrorResponse(msg));
     }
 }

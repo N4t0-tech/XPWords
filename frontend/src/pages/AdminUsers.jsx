@@ -26,6 +26,16 @@ export default function AdminUsers({ user }) {
     }
   }
 
+  async function handleToggleActive(userId) {
+    try {
+      await api.put(`/admin/users/${userId}/toggle-active`);
+      setUsers(prev => prev.map(u => u.id === userId ? { ...u, active: !u.active } : u));
+      showToast('Estado actualizado');
+    } catch (err) {
+      showToast(err.message);
+    }
+  }
+
   function allowedRoles(targetRole) {
     if (isModerator) return ['STUDENT', 'TEACHER', 'MODERATOR'];
     if (targetRole === 'MODERATOR') return ['MODERATOR'];
@@ -42,7 +52,7 @@ export default function AdminUsers({ user }) {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
               <thead>
                 <tr style={{ color: '#9ca3af', borderBottom: '1px solid #1c2030' }}>
-                  {['Nombre', 'Email', 'Nivel', 'Rol'].map(h => (
+                  {['Nombre', 'Email', 'Nivel', 'Rol', 'Activo'].map(h => (
                     <th key={h} style={{ padding: '10px 12px', textAlign: h === 'Nombre' || h === 'Email' ? 'left' : 'center' }}>
                       <Skeleton width={60} height={14} />
                     </th>
@@ -56,6 +66,7 @@ export default function AdminUsers({ user }) {
                     <td style={{ padding: '10px 12px' }}><Skeleton width={140} height={14} /></td>
                     <td style={{ padding: '10px 12px', textAlign: 'center' }}><Skeleton width={30} height={14} /></td>
                     <td style={{ padding: '10px 12px', textAlign: 'center' }}><Skeleton width={80} height={30} borderRadius={6} /></td>
+                    <td style={{ padding: '10px 12px', textAlign: 'center' }}><Skeleton width={60} height={30} borderRadius={6} /></td>
                   </tr>
                 ))}
               </tbody>
@@ -69,6 +80,7 @@ export default function AdminUsers({ user }) {
                   <th style={{ textAlign: 'left', padding: '10px 12px' }}>Email</th>
                   <th style={{ textAlign: 'center', padding: '10px 12px' }}>Nivel</th>
                   <th style={{ textAlign: 'center', padding: '10px 12px' }}>Rol</th>
+                  <th style={{ textAlign: 'center', padding: '10px 12px' }}>Activo</th>
                 </tr>
               </thead>
               <tbody>
@@ -104,11 +116,32 @@ export default function AdminUsers({ user }) {
                       </select>
                     )}
                   </td>
+                  <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+                    {isSelf ? (
+                      <span style={{ color: '#6ee7b7', fontSize: '13px' }}>Activo</span>
+                    ) : (
+                      <button
+                        onClick={() => handleToggleActive(u.id)}
+                        style={{
+                          background: u.active ? '#0a2a1a' : '#2a1010',
+                          color: u.active ? '#6ee7b7' : '#f87171',
+                          border: u.active ? '1px solid #0a3a1a' : '1px solid #4a2020',
+                          borderRadius: '6px', padding: '6px 12px',
+                          fontSize: '13px', cursor: 'pointer',
+                          fontFamily: "'Rajdhani', sans-serif", fontWeight: 600,
+                          letterSpacing: '.05em', transition: 'all .15s',
+                          opacity: 0.9,
+                        }}
+                      >
+                        {u.active ? 'ACTIVO' : 'INACTIVO'}
+                      </button>
+                    )}
+                  </td>
                 </tr>
               );
             })}
             {users.length === 0 && (
-              <tr><td colSpan={4} style={{ textAlign: 'center', padding: '2rem', color: '#4b5563' }}>No hay usuarios</td></tr>
+              <tr><td colSpan={5} style={{ textAlign: 'center', padding: '2rem', color: '#4b5563' }}>No hay usuarios</td></tr>
             )}
             </tbody>
         </table>

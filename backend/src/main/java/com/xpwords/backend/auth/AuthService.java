@@ -57,6 +57,10 @@ public class AuthService {
             throw new BadCredentialsException("Email o contraseña incorrectos");
         }
 
+        if (!user.isActive()) {
+            throw new BadCredentialsException("Tu cuenta ha sido desactivada");
+        }
+
         String token = jwtTokenProvider.generateToken(user.getId(), user.getRole().name(), request.isRememberMe());
         return new AuthResponse(token, user.getId(), user.getName(), user.getEmail(), user.getRole().name());
     }
