@@ -1,18 +1,20 @@
 import { useState, useEffect } from 'react';
 import ResourceItem from '../components/ResourceItem';
 import SectionHeader from '../components/SectionHeader';
-import Toast from '../components/Toast';
+import Skeleton from '../components/Skeleton';
 import { api } from '../api/client';
+import { useToast } from '../components/ToastContext';
 
 export default function TeacherResources() {
+  const { showToast } = useToast();
+  const [loading, setLoading] = useState(true);
   const [resources, setResources] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ title: '', category: 'Vocabulario', meta: '', type: 'flash', btn: '', url: '' });
-  const [toast, setToast] = useState({ show: false, msg: '' });
 
   useEffect(() => {
-    api.get('/resources').then(setResources).catch(() => {});
+    api.get('/resources').then(setResources).catch(err => showToast(err.message)).finally(() => setLoading(false));
   }, []);
 
   function openCreate() {
@@ -33,15 +35,15 @@ export default function TeacherResources() {
       if (editing) {
         const updated = await api.put(`/resources/${editing.id}`, form);
         setResources(prev => prev.map(r => r.id === editing.id ? updated : r));
-        setToast({ show: true, msg: 'Recurso actualizado' });
+        showToast('Recurso actualizado');
       } else {
         const created = await api.post('/resources', form);
         setResources(prev => [...prev, created]);
-        setToast({ show: true, msg: 'Recurso creado' });
+        showToast('Recurso creado');
       }
       setShowForm(false);
     } catch (err) {
-      setToast({ show: true, msg: err.message });
+      showToast(err.message);
     }
   }
 
@@ -49,9 +51,9 @@ export default function TeacherResources() {
     try {
       await api.delete(`/resources/${id}`);
       setResources(prev => prev.filter(r => r.id !== id));
-      setToast({ show: true, msg: 'Recurso eliminado' });
+      showToast('Recurso eliminado');
     } catch (err) {
-      setToast({ show: true, msg: err.message });
+      showToast(err.message);
     }
   }
 
@@ -63,7 +65,21 @@ export default function TeacherResources() {
       </div>
 
       <div className="xp-res-list">
-        {resources.map(r => (
+        {loading
+          ? [1,2,3,4].map(i => (
+              <div key={i} className="xp-res-item" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <Skeleton width={44} height={44} borderRadius={10} />
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <Skeleton width="50%" height={16} />
+                  <Skeleton width="70%" height={14} />
+                </div>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <Skeleton width={32} height={32} borderRadius={6} />
+                  <Skeleton width={32} height={32} borderRadius={6} />
+                </div>
+              </div>
+            ))
+          : resources.map(r => (
           <ResourceItem
             key={r.id}
             item={r}
@@ -132,7 +148,6 @@ export default function TeacherResources() {
         </div>
       )}
 
-      <Toast message={toast.msg} show={toast.show} onClose={() => setToast({ show: false, msg: '' })} />
     </div>
   );
 }

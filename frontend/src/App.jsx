@@ -19,9 +19,11 @@ import AdminUsers from './pages/AdminUsers';
 import StudentRequests from './pages/StudentRequests';
 import AuthCallback from './pages/AuthCallback';
 import { api } from './api/client';
+import { useToast } from './components/ToastContext';
 import './App.css';
 
 export default function App() {
+  const { showToast } = useToast();
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [authMode, setAuthMode] = useState(null);
   const [user, setUser] = useState(null);
@@ -75,8 +77,9 @@ export default function App() {
     try {
       const data = await api.get('/users/me');
       setUser(data);
-    } catch {
+    } catch (err) {
       setUser(null);
+      showToast(err.message);
     }
     setLoggedIn(true);
     setAuthMode(null);
@@ -97,6 +100,7 @@ export default function App() {
     <BrowserRouter>
       <div className="xp">
         {isLoggedIn && <Navbar user={user} viewMode={effectiveView} onToggleView={handleToggleView} />}
+        <main className="xp-main">
         <Routes>
           <Route
             path="/auth/callback"
@@ -129,6 +133,7 @@ export default function App() {
           )}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </main>
       </div>
 
       {authMode && (

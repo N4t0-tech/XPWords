@@ -21,8 +21,12 @@ public class AuthController {
     private final UserRepository userRepository;
     private final ConcurrentHashMap<String, List<Long>> loginAttempts = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, List<Long>> registerAttempts = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, List<Long>> forgotAttempts = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, List<Long>> resetAttempts = new ConcurrentHashMap<>();
     private static final int LOGIN_MAX = 5;
     private static final int REGISTER_MAX = 3;
+    private static final int FORGOT_MAX = 3;
+    private static final int RESET_MAX = 5;
     private static final long WINDOW_MS = 60_000;
 
     public AuthController(AuthService authService, UserRepository userRepository) {
@@ -62,6 +66,26 @@ public class AuthController {
         });
         List<Long> timestamps = store.get(ip);
         return timestamps != null && timestamps.size() > max;
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Map<String, String>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request, HttpServletRequest httpRequest) {
+        String ip = httpRequest.getRemoteAddr();
+        if (isRateLimited(forgotAttempts, ip, FORGOT_MAX)) {
+            return ResponseEntity.status(429).build();
+        }
+        authService.forgotPassword(request.getEmail());
+        return ResponseEntity.ok(Map.of("message", "Si el email existe, recibirás un código de recuperación"));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Map<String, String>> resetPassword(@Valid @RequestBody ResetPasswordRequest request, HttpServletRequest httpRequest) {
+        String ip = httpRequest.getRemoteAddr();
+        if (isRateLimited(resetAttempts, ip, RESET_MAX)) {
+            return ResponseEntity.status(429).build();
+        }
+        authService.resetPassword(request.getCode(), request.getNewPassword());
+        return ResponseEntity.ok(Map.of("message", "Contraseña actualizada correctamente"));
     }
 
     @PostMapping("/discord")

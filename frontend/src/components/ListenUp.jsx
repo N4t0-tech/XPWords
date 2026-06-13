@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { api } from '../api/client';
-import Toast from './Toast';
 import Tutorial from './Tutorial';
+import { useToast } from './ToastContext';
 
 const TIMER_SECONDS = 12;
 const IDLE_TIMEOUT = 20000;
@@ -18,8 +18,9 @@ export default function ListenUp({ onClose }) {
   const [maxStreak, setMaxStreak] = useState(0);
   const [answered, setAnswered] = useState(false);
   const [lastPick, setLastPick] = useState(null);
+  const { showToast } = useToast();
+  const [loading, setLoading] = useState(true);
   const [words, setWords] = useState([]);
-  const [toast, setToast] = useState({ show: false, msg: '' });
   const [showTutorial, setShowTutorial] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIMER_SECONDS);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -30,8 +31,6 @@ export default function ListenUp({ onClose }) {
   const scoreSubmitted = useRef(false);
   const timerStartedRef = useRef(false);
   const wordOrderRef = useRef([]);
-
-  const showToast = useCallback((msg) => setToast({ show: true, msg }), []);
 
   useEffect(() => { answeredRef.current = answered; }, [answered]);
 
@@ -47,7 +46,7 @@ export default function ListenUp({ onClose }) {
       scoreSubmitted.current = true;
       api.post('/games/score', { gameType: 'listenup', score, streak: maxStreak, round: index + 1 })
         .then(() => window.dispatchEvent(new Event('user-updated')))
-        .catch(() => {});
+        .catch(err => showToast(err.message));
     }
   }, [status]);
 
@@ -90,7 +89,7 @@ export default function ListenUp({ onClose }) {
         correct: w.correctIndex,
       }));
       setWords(parsed);
-    }).catch(() => {});
+    }).catch(err => showToast(err.message)).finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -226,8 +225,8 @@ export default function ListenUp({ onClose }) {
             12 segundos. 3 vidas.
           </p>
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-            <button className="xp-btn-primary" onClick={startGame}>COMENZAR</button>
-            <button className="xp-btn-secondary" onClick={() => setShowTutorial(true)}>¿CÓMO JUGAR?</button>
+            <button className="xp-btn-primary" onClick={startGame} disabled={loading} style={{ opacity: loading ? 0.5 : 1 }}>{loading ? 'CARGANDO...' : 'COMENZAR'}</button>
+            <button className="xp-btn-secondary" onClick={() => setShowTutorial(true)} disabled={loading} style={{ opacity: loading ? 0.5 : 1 }}>¿CÓMO JUGAR?</button>
           </div>
         </div>
         {showTutorial && (
@@ -319,7 +318,6 @@ export default function ListenUp({ onClose }) {
         )}
       </div>
 
-      <Toast message={toast.msg} show={toast.show} onClose={() => setToast({ show: false, msg: '' })} />
     </div>
   );
 }

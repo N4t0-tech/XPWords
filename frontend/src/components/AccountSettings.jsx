@@ -3,13 +3,13 @@ import { api, getAuthBaseUrl } from '../api/client';
 import ChangePasswordModal from './ChangePasswordModal';
 import SetPasswordModal from './SetPasswordModal';
 import DeleteAccountModal from './DeleteAccountModal';
-import Toast from './Toast';
+import { useToast } from './ToastContext';
 
 export default function AccountSettings({ user, onLogout }) {
+  const { showToast } = useToast();
   const [showChangePw, setShowChangePw] = useState(false);
   const [showSetPw, setShowSetPw] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
-  const [toast, setToast] = useState({ show: false, msg: '' });
   const discordTag = user?.discordTag || null;
   const role = user?.role || 'STUDENT';
 
@@ -18,7 +18,7 @@ export default function AccountSettings({ user, onLogout }) {
       const data = await api.get('/users/me/discord/link');
       window.location.href = data.url;
     } catch (err) {
-      setToast({ show: true, msg: err.message });
+      showToast(err.message);
     }
   }
 
@@ -26,9 +26,9 @@ export default function AccountSettings({ user, onLogout }) {
     try {
       await api.post('/auth/discord', {});
       const u = await api.get('/users/me');
-      setToast({ show: true, msg: 'Discord desconectado' });
+      showToast('Discord desconectado');
     } catch (err) {
-      setToast({ show: true, msg: err.message });
+      showToast(err.message);
     }
   }
 
@@ -87,13 +87,13 @@ export default function AccountSettings({ user, onLogout }) {
       {showSetPw && (
         <SetPasswordModal
           onClose={() => setShowSetPw(false)}
-          onDone={() => { setShowSetPw(false); setToast({ show: true, msg: 'Contraseña establecida' }); }}
+          onDone={() => { setShowSetPw(false); showToast('Contraseña establecida'); }}
         />
       )}
       {showChangePw && (
         <ChangePasswordModal
           onClose={() => setShowChangePw(false)}
-          onDone={() => { setShowChangePw(false); setToast({ show: true, msg: 'Contraseña actualizada' }); }}
+          onDone={() => { setShowChangePw(false); showToast('Contraseña actualizada'); }}
         />
       )}
       {showDelete && (
@@ -102,7 +102,6 @@ export default function AccountSettings({ user, onLogout }) {
           onDone={() => { setShowDelete(false); onLogout(); }}
         />
       )}
-      <Toast message={toast.msg} show={toast.show} onClose={() => setToast({ show: false, msg: '' })} />
     </div>
   );
 }

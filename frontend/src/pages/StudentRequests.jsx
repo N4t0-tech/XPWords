@@ -1,21 +1,12 @@
 import { useState, useEffect } from 'react';
 import SectionHeader from '../components/SectionHeader';
-import Toast from '../components/Toast';
+import Skeleton from '../components/Skeleton';
 import { api } from '../api/client';
-
-const statusLabels = {
-  PENDING: 'Pendiente',
-  APPROVED: 'Aprobada',
-  REJECTED: 'Rechazada',
-};
-
-const statusColors = {
-  PENDING: '#f59e0b',
-  APPROVED: '#6ee7b7',
-  REJECTED: '#f87171',
-};
+import { useToast } from '../components/ToastContext';
 
 export default function StudentRequests({ user }) {
+  const { showToast } = useToast();
+  const [loading, setLoading] = useState(true);
   const [requests, setRequests] = useState([]);
   const [teachers, setTeachers] = useState([]);
   const [teacherId, setTeacherId] = useState('');
@@ -23,11 +14,12 @@ export default function StudentRequests({ user }) {
   const [message, setMessage] = useState('');
   const [requestedDate, setRequestedDate] = useState('');
   const [sending, setSending] = useState(false);
-  const [toast, setToast] = useState({ show: false, msg: '' });
 
   useEffect(() => {
-    api.get('/class-requests?as=student').then(setRequests).catch(() => {});
-    api.get('/users/teachers').then(setTeachers).catch(() => {});
+    Promise.all([
+      api.get('/class-requests?as=student').then(setRequests).catch(err => showToast(err.message)),
+      api.get('/users/teachers').then(setTeachers).catch(err => showToast(err.message)),
+    ]).finally(() => setLoading(false));
   }, []);
 
   async function handleSubmit(e) {
@@ -47,9 +39,9 @@ export default function StudentRequests({ user }) {
       setTopic('');
       setMessage('');
       setRequestedDate('');
-      setToast({ show: true, msg: 'Solicitud enviada' });
+      showToast('Solicitud enviada');
     } catch (err) {
-      setToast({ show: true, msg: err.message });
+      showToast(err.message);
     } finally {
       setSending(false);
     }
@@ -66,7 +58,15 @@ export default function StudentRequests({ user }) {
       <SectionHeader icon="messages" label="SOLICITAR CLASE PRIVADA" />
 
       <div className="xp-settings-card" style={{ marginBottom: '2rem' }}>
-        <form className="xp-modal-form" onSubmit={handleSubmit}>
+        {loading
+          ? <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <Skeleton width="100%" height={44} borderRadius={7} />
+              <Skeleton width="100%" height={44} borderRadius={7} />
+              <Skeleton width="100%" height={88} borderRadius={7} />
+              <Skeleton width="100%" height={44} borderRadius={7} />
+              <Skeleton width={160} height={44} borderRadius={7} />
+            </div>
+          : <form className="xp-modal-form" onSubmit={handleSubmit}>
           <div className="xp-modal-field">
             <label htmlFor="req-teacher">Profesor</label>
             <select id="req-teacher" value={teacherId} onChange={e => setTeacherId(e.target.value)} required>
@@ -104,19 +104,33 @@ export default function StudentRequests({ user }) {
           <button type="submit" className="xp-btn-primary" style={{ alignSelf: 'flex-start' }} disabled={sending}>
             {sending ? 'ENVIANDO...' : 'ENVIAR SOLICITUD'}
           </button>
-        </form>
+          </form>
+        }
       </div>
 
       <SectionHeader icon="list" label="MIS SOLICITUDES" />
 
-      {requests.length === 0 && (
-        <p style={{ color: '#4b5563', fontSize: '14px', textAlign: 'center', padding: '2rem' }}>
-          No has enviado ninguna solicitud
-        </p>
-      )}
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        {requests.map(r => (
+      {loading
+        ? <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {[1,2,3].map(i => (
+              <div key={i} className="xp-res-item" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <Skeleton width={44} height={44} borderRadius={10} />
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <Skeleton width="40%" height={16} />
+                  <Skeleton width="60%" height={14} />
+                </div>
+                <Skeleton width={60} height={24} borderRadius={4} />
+              </div>
+            ))}
+          </div>
+        : <>
+            {requests.length === 0 && (
+              <p style={{ color: '#4b5563', fontSize: '14px', textAlign: 'center', padding: '2rem' }}>
+                No has enviado ninguna solicitud
+              </p>
+            )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {requests.map(r => (
           <div key={r.id} className="xp-res-item" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <div className="xp-res-thumb link" style={{ background: '#1a1230', color: '#a78bfa' }}>
               <i className="ti ti-mail" aria-hidden="true" />
@@ -131,14 +145,15 @@ export default function StudentRequests({ user }) {
                 {formatDate(r.createdAt)}
               </div>
             </div>
-            <span style={{ fontSize: '13px', fontWeight: '600', color: statusColors[r.status] || '#6b7280' }}>
-              {statusLabels[r.status] || r.status}
+            <span style={{ fontSize: '13px', fontWeight: '600', color: {PENDING:'#f59e0b',APPROVED:'#6ee7b7',REJECTED:'#f87171'}[r.status] || '#6b7280' }}>
+              {{PENDING:'Pendiente',APPROVED:'Aprobada',REJECTED:'Rechazada'}[r.status] || r.status}
             </span>
           </div>
         ))}
-      </div>
+            </div>
+          </>
+      }
 
-      <Toast message={toast.msg} show={toast.show} onClose={() => setToast({ show: false, msg: '' })} />
     </div>
   );
 }

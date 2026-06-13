@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import SectionHeader from '../components/SectionHeader';
-import Toast from '../components/Toast';
+import Skeleton from '../components/Skeleton';
 import { api } from '../api/client';
+import { useToast } from '../components/ToastContext';
 
 const GAMES = [
   { id: 'wordsnap', icon: '🎯', title: 'WordSnap', desc: 'Adivina el significado' },
@@ -11,10 +12,11 @@ const GAMES = [
 ];
 
 function WordEditor({ game, onBack }) {
+  const { showToast } = useToast();
+  const [loading, setLoading] = useState(true);
   const [words, setWords] = useState([]);
   const [editingWord, setEditingWord] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [toast, setToast] = useState({ show: false, msg: '' });
   const [form, setForm] = useState({ word: '', hint: '', options: [''], correctIndex: 0 });
 
   useEffect(() => {
@@ -23,7 +25,7 @@ function WordEditor({ game, onBack }) {
         ...w,
         options: typeof w.options === 'string' ? JSON.parse(w.options) : w.options,
       })));
-    }).catch(() => {});
+    }).catch(err => showToast(err.message)).finally(() => setLoading(false));
   }, [game.id]);
 
   function resetForm() {
@@ -79,16 +81,16 @@ function WordEditor({ game, onBack }) {
         const updated = await api.put(`/words/${editingWord.id}`, payload);
         updated.options = typeof updated.options === 'string' ? JSON.parse(updated.options) : updated.options;
         setWords(prev => prev.map(w => w.id === editingWord.id ? updated : w));
-        setToast({ show: true, msg: 'Palabra actualizada' });
+        showToast('Palabra actualizada');
       } else {
         const created = await api.post('/words', payload);
         created.options = typeof created.options === 'string' ? JSON.parse(created.options) : created.options;
         setWords(prev => [...prev, created]);
-        setToast({ show: true, msg: 'Palabra creada' });
+        showToast('Palabra creada');
       }
       setShowForm(false);
     } catch (err) {
-      setToast({ show: true, msg: err.message });
+      showToast(err.message);
     }
   }
 
@@ -96,9 +98,9 @@ function WordEditor({ game, onBack }) {
     try {
       await api.delete(`/words/${wordId}`);
       setWords(prev => prev.filter(w => w.id !== wordId));
-      setToast({ show: true, msg: 'Palabra eliminada' });
+      showToast('Palabra eliminada');
     } catch (err) {
-      setToast({ show: true, msg: err.message });
+      showToast(err.message);
     }
   }
 
@@ -112,9 +114,28 @@ function WordEditor({ game, onBack }) {
         <button className="xp-btn-primary" onClick={openCreate}>AÑADIR PALABRA</button>
       </div>
 
-      <div style={{ color: '#6b7280', fontSize: '13px', marginBottom: '1rem' }}>{words.length} palabras</div>
-
-      {words.map(w => (
+      {loading
+        ? <div>{[1,2,3,4].map(i => (
+            <div key={i} style={{ background: '#0e1018', border: '1px solid #1c2030', borderRadius: '10px', padding: '1rem', marginBottom: '0.6rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <Skeleton width="40%" height={16} />
+                <Skeleton width="60%" height={14} />
+                <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>
+                  {[1,2,3,4].map(j => <Skeleton key={j} width={60} height={22} borderRadius={4} />)}
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <Skeleton width={32} height={32} borderRadius={6} />
+                <Skeleton width={32} height={32} borderRadius={6} />
+              </div>
+            </div>
+          ))}</div>
+        : <>
+            <div style={{ color: '#6b7280', fontSize: '13px', marginBottom: '1rem' }}>{words.length} palabras</div>
+            {words.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '2rem', color: '#4b5563' }}>Este juego no tiene palabras todavía</div>
+            )}
+            {words.map(w => (
         <div key={w.id} style={{ background: '#0e1018', border: '1px solid #1c2030', borderRadius: '10px', padding: '1rem', marginBottom: '0.6rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: '16px', fontWeight: 600, color: '#e2e8f0' }}>{w.word}</div>
@@ -137,10 +158,6 @@ function WordEditor({ game, onBack }) {
           </div>
         </div>
       ))}
-
-      {words.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '2rem', color: '#4b5563' }}>Este juego no tiene palabras todavía</div>
-      )}
 
       {showForm && (
         <div className="xp-modal-overlay" onClick={() => setShowForm(false)}>
@@ -182,8 +199,9 @@ function WordEditor({ game, onBack }) {
           </div>
         </div>
       )}
+      </>
+      }
 
-      <Toast message={toast.msg} show={toast.show} onClose={() => setToast({ show: false, msg: '' })} />
     </div>
   );
 }

@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
 import SectionHeader from '../components/SectionHeader';
-import Toast from '../components/Toast';
+import Skeleton from '../components/Skeleton';
 import { api } from '../api/client';
+import { useToast } from '../components/ToastContext';
 
 export default function TeacherStudents() {
+  const { showToast } = useToast();
+  const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState([]);
   const [badges, setBadges] = useState([]);
   const [userBadges, setUserBadges] = useState({});
   const [assigning, setAssigning] = useState(null);
-  const [toast, setToast] = useState({ show: false, msg: '' });
 
   useEffect(() => {
     api.get('/users/students').then(async (data) => {
@@ -20,8 +22,8 @@ export default function TeacherStudents() {
         } catch { ubMap[s.id] = []; }
       }));
       setUserBadges(ubMap);
-    }).catch(() => {});
-    api.get('/badges').then(setBadges).catch(() => {});
+    }).catch(err => showToast(err.message)).finally(() => setLoading(false));
+    api.get('/badges').then(setBadges).catch(err => showToast(err.message));
   }, []);
 
   async function handleAssign(userId, badgeId) {
@@ -30,9 +32,9 @@ export default function TeacherStudents() {
       const updated = await api.get(`/badges/user/${userId}`);
       setUserBadges(prev => ({ ...prev, [userId]: updated }));
       setAssigning(null);
-      setToast({ show: true, msg: 'Medalla asignada' });
+      showToast('Medalla asignada');
     } catch (err) {
-      setToast({ show: true, msg: err.message });
+      showToast(err.message);
     }
   }
 
@@ -41,9 +43,9 @@ export default function TeacherStudents() {
       await api.delete(`/badges/assign/${userId}/${badgeId}`);
       const updated = await api.get(`/badges/user/${userId}`);
       setUserBadges(prev => ({ ...prev, [userId]: updated }));
-      setToast({ show: true, msg: 'Medalla removida' });
+      showToast('Medalla removida');
     } catch (err) {
-      setToast({ show: true, msg: err.message });
+      showToast(err.message);
     }
   }
 
@@ -54,20 +56,47 @@ export default function TeacherStudents() {
       <SectionHeader icon="users" label="ALUMNOS" />
       <p style={{ color: '#6b7280', marginBottom: '1rem', fontSize: '14px' }}>{students.length} estudiantes registrados</p>
 
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
-          <thead>
-            <tr style={{ color: '#9ca3af', borderBottom: '1px solid #1c2030' }}>
-              <th style={{ textAlign: 'left', padding: '10px 12px' }}>Nombre</th>
-              <th style={{ textAlign: 'left', padding: '10px 12px' }}>Email</th>
-              <th style={{ textAlign: 'center', padding: '10px 12px' }}>Nivel</th>
-              <th style={{ textAlign: 'center', padding: '10px 12px' }}>XP</th>
-              <th style={{ textAlign: 'center', padding: '10px 12px' }}>Medallas</th>
-              <th style={{ textAlign: 'center', padding: '10px 12px' }}>Discord</th>
-            </tr>
-          </thead>
-          <tbody>
-            {students.map(s => (
+      {loading
+        ? <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+              <thead>
+                <tr style={{ color: '#9ca3af', borderBottom: '1px solid #1c2030' }}>
+                  {['Nombre', 'Email', 'Nivel', 'XP', 'Medallas', 'Discord'].map(h => (
+                    <th key={h} style={{ padding: '10px 12px', textAlign: h === 'Nombre' || h === 'Email' ? 'left' : 'center' }}>
+                      <Skeleton width={60} height={14} />
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[1,2,3,4,5].map(row => (
+                  <tr key={row} style={{ borderBottom: '1px solid #13161f' }}>
+                    <td style={{ padding: '10px 12px' }}><div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><Skeleton width={28} height={28} borderRadius={14} /><Skeleton width={100} height={14} /></div></td>
+                    <td style={{ padding: '10px 12px' }}><Skeleton width={120} height={14} /></td>
+                    <td style={{ padding: '10px 12px', textAlign: 'center' }}><Skeleton width={30} height={14} /></td>
+                    <td style={{ padding: '10px 12px', textAlign: 'center' }}><Skeleton width={40} height={14} /></td>
+                    <td style={{ padding: '10px 12px', textAlign: 'center' }}><Skeleton width={60} height={14} /></td>
+                    <td style={{ padding: '10px 12px', textAlign: 'center' }}><Skeleton width={80} height={14} /></td>
+                  </tr>
+                ))}
+            </tbody>
+        </table>
+      </div>
+        : <>
+            <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+              <thead>
+                <tr style={{ color: '#9ca3af', borderBottom: '1px solid #1c2030' }}>
+                  <th style={{ textAlign: 'left', padding: '10px 12px' }}>Nombre</th>
+                  <th style={{ textAlign: 'left', padding: '10px 12px' }}>Email</th>
+                  <th style={{ textAlign: 'center', padding: '10px 12px' }}>Nivel</th>
+                  <th style={{ textAlign: 'center', padding: '10px 12px' }}>XP</th>
+                  <th style={{ textAlign: 'center', padding: '10px 12px' }}>Medallas</th>
+                  <th style={{ textAlign: 'center', padding: '10px 12px' }}>Discord</th>
+                </tr>
+              </thead>
+              <tbody>
+                {students.map(s => (
               <tr key={s.id} style={{ borderBottom: '1px solid #13161f', color: '#e2e8f0' }}>
                 <td style={{ padding: '10px 12px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -148,8 +177,8 @@ export default function TeacherStudents() {
           </div>
         </div>
       )}
+      </>}
 
-      <Toast message={toast.msg} show={toast.show} onClose={() => setToast({ show: false, msg: '' })} />
     </div>
   );
 }

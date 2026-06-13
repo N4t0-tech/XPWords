@@ -21,8 +21,7 @@ public class LeaderboardController {
 
     @GetMapping("/leaderboard")
     public ResponseEntity<List<LeaderboardEntry>> getLeaderboard() {
-        List<User> users = userRepository.findAll();
-        users.sort((a, b) -> b.getXp() - a.getXp());
+        List<User> users = userRepository.findAllByOrderByXpDesc();
 
         AtomicInteger rank = new AtomicInteger(1);
         List<LeaderboardEntry> entries = new ArrayList<>();

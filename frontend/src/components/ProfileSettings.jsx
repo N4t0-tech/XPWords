@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { api } from '../api/client';
-import Toast from './Toast';
+import { useToast } from './ToastContext';
 
 export default function ProfileSettings({ user }) {
+  const { showToast } = useToast();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [toast, setToast] = useState({ show: false, msg: '' });
 
   useEffect(() => {
     if (user) {
@@ -19,9 +19,9 @@ export default function ProfileSettings({ user }) {
     if (!name.trim() || !email.trim()) return;
     try {
       await api.put('/users/me', { name, email });
-      setToast({ show: true, msg: 'Cambios guardados' });
+      showToast('Cambios guardados');
     } catch (err) {
-      setToast({ show: true, msg: err.message });
+      showToast(err.message);
     }
   }
 
@@ -41,7 +41,6 @@ export default function ProfileSettings({ user }) {
           GUARDAR CAMBIOS
         </button>
       </form>
-      <Toast message={toast.msg} show={toast.show} onClose={() => setToast({ show: false, msg: '' })} />
     </div>
   );
 }
