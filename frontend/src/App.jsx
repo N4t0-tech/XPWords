@@ -26,6 +26,16 @@ export default function App() {
   const { showToast } = useToast();
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [authMode, setAuthMode] = useState(null);
+  const [authError, setAuthError] = useState(null);
+  const openAuth = (param) => {
+    if (typeof param === 'string') {
+      setAuthMode(param);
+      setAuthError(null);
+    } else {
+      setAuthMode(param.mode);
+      setAuthError(param.error || null);
+    }
+  };
   const [user, setUser] = useState(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [viewMode, setViewMode] = useState(() => localStorage.getItem('viewMode') || 'teacher');
@@ -109,7 +119,7 @@ export default function App() {
           <Route
             path="/"
             element={
-              isLoggedIn ? <Navigate to="/home" replace /> : <Landing onOpenAuth={setAuthMode} />
+              isLoggedIn ? <Navigate to="/home" replace /> : <Landing onOpenAuth={openAuth} />
             }
           />
           <Route path="/home" element={<AuthGuard isLoggedIn={isLoggedIn}><Home /></AuthGuard>} />
@@ -137,7 +147,7 @@ export default function App() {
       </div>
 
       {authMode && (
-        <AuthModal mode={authMode} onClose={() => setAuthMode(null)} onLogin={handleLogin} />
+        <AuthModal mode={authMode} error={authError} onClose={() => { setAuthMode(null); setAuthError(null); }} onLogin={handleLogin} />
       )}
     </BrowserRouter>
   );
