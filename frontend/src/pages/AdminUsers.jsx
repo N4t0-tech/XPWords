@@ -1,26 +1,28 @@
 import { useState, useEffect } from 'react';
 import SectionHeader from '../components/SectionHeader';
-import Toast from '../components/Toast';
+import Skeleton from '../components/Skeleton';
 import { api } from '../api/client';
+import { useToast } from '../components/ToastContext';
 
 const ROLE_LABELS = { STUDENT: 'Estudiante', TEACHER: 'Profesor', MODERATOR: 'Moderador' };
 
 export default function AdminUsers({ user }) {
+  const { showToast } = useToast();
+  const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState([]);
-  const [toast, setToast] = useState({ show: false, msg: '' });
   const isModerator = user?.role === 'MODERATOR';
 
   useEffect(() => {
-    api.get('/admin/users').then(setUsers).catch(() => {});
+    api.get('/admin/users').then(setUsers).catch(err => showToast(err.message)).finally(() => setLoading(false));
   }, []);
 
   async function handleRoleChange(userId, newRole) {
     try {
       await api.put(`/admin/users/${userId}/role`, { role: newRole });
       setUsers(prev => prev.map(u => u.id === userId ? { ...u, role: newRole } : u));
-      setToast({ show: true, msg: `Rol cambiado a ${ROLE_LABELS[newRole]}` });
+      showToast(`Rol cambiado a ${ROLE_LABELS[newRole]}`);
     } catch (err) {
-      setToast({ show: true, msg: err.message });
+      showToast(err.message);
     }
   }
 
@@ -35,18 +37,42 @@ export default function AdminUsers({ user }) {
       <SectionHeader icon="shield-check" label="ADMIN — USUARIOS" />
       <p style={{ color: '#6b7280', marginBottom: '1rem', fontSize: '14px' }}>{users.length} usuarios registrados</p>
 
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
-          <thead>
-            <tr style={{ color: '#9ca3af', borderBottom: '1px solid #1c2030' }}>
-              <th style={{ textAlign: 'left', padding: '10px 12px' }}>Nombre</th>
-              <th style={{ textAlign: 'left', padding: '10px 12px' }}>Email</th>
-              <th style={{ textAlign: 'center', padding: '10px 12px' }}>Nivel</th>
-              <th style={{ textAlign: 'center', padding: '10px 12px' }}>Rol</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map(u => {
+      {loading
+        ? <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+              <thead>
+                <tr style={{ color: '#9ca3af', borderBottom: '1px solid #1c2030' }}>
+                  {['Nombre', 'Email', 'Nivel', 'Rol'].map(h => (
+                    <th key={h} style={{ padding: '10px 12px', textAlign: h === 'Nombre' || h === 'Email' ? 'left' : 'center' }}>
+                      <Skeleton width={60} height={14} />
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[1,2,3,4,5].map(row => (
+                  <tr key={row} style={{ borderBottom: '1px solid #13161f' }}>
+                    <td style={{ padding: '10px 12px' }}><div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><Skeleton width={28} height={28} borderRadius={14} /><Skeleton width={100} height={14} /></div></td>
+                    <td style={{ padding: '10px 12px' }}><Skeleton width={140} height={14} /></td>
+                    <td style={{ padding: '10px 12px', textAlign: 'center' }}><Skeleton width={30} height={14} /></td>
+                    <td style={{ padding: '10px 12px', textAlign: 'center' }}><Skeleton width={80} height={30} borderRadius={6} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        : <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+              <thead>
+                <tr style={{ color: '#9ca3af', borderBottom: '1px solid #1c2030' }}>
+                  <th style={{ textAlign: 'left', padding: '10px 12px' }}>Nombre</th>
+                  <th style={{ textAlign: 'left', padding: '10px 12px' }}>Email</th>
+                  <th style={{ textAlign: 'center', padding: '10px 12px' }}>Nivel</th>
+                  <th style={{ textAlign: 'center', padding: '10px 12px' }}>Rol</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map(u => {
               const opts = allowedRoles(u.role);
               const isSelf = u.id === user?.id;
               const isLocked = !isModerator && u.role === 'MODERATOR';
@@ -84,11 +110,11 @@ export default function AdminUsers({ user }) {
             {users.length === 0 && (
               <tr><td colSpan={4} style={{ textAlign: 'center', padding: '2rem', color: '#4b5563' }}>No hay usuarios</td></tr>
             )}
-          </tbody>
+            </tbody>
         </table>
       </div>
+      }
 
-      <Toast message={toast.msg} show={toast.show} onClose={() => setToast({ show: false, msg: '' })} />
     </div>
   );
 }

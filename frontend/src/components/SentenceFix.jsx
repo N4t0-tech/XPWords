@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { api } from '../api/client';
-import Toast from './Toast';
 import Tutorial from './Tutorial';
+import { useToast } from './ToastContext';
 
 const TIMER_SECONDS = 30;
 const XP_PER_SENTENCE = 100;
@@ -27,7 +27,8 @@ export default function SentenceFix({ onClose }) {
   const [words, setWords] = useState([]);
   const [slots, setSlots] = useState([]);
   const [pool, setPool] = useState([]);
-  const [toast, setToast] = useState({ show: false, msg: '' });
+  const { showToast } = useToast();
+  const [loading, setLoading] = useState(true);
   const [showTutorial, setShowTutorial] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIMER_SECONDS);
   const [selectedWord, setSelectedWord] = useState(null);
@@ -41,8 +42,6 @@ export default function SentenceFix({ onClose }) {
   const dragRef = useRef(null);
   const wordOrderRef = useRef([]);
 
-  const showToast = useCallback((msg) => setToast({ show: true, msg }), []);
-
   useEffect(() => { streakRef.current = streak; }, [streak]);
 
   useEffect(() => {
@@ -52,7 +51,7 @@ export default function SentenceFix({ onClose }) {
         options: typeof w.options === 'string' ? JSON.parse(w.options) : w.options,
       }));
       setWords(parsed);
-    }).catch(() => {});
+    }).catch(err => showToast(err.message)).finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -60,7 +59,7 @@ export default function SentenceFix({ onClose }) {
       scoreSubmitted.current = true;
       api.post('/games/score', { gameType: 'sentencefix', score, streak: maxStreak, round: index + 1 })
         .then(() => window.dispatchEvent(new Event('user-updated')))
-        .catch(() => {});
+        .catch(err => showToast(err.message));
     }
   }, [status]);
 
@@ -290,8 +289,8 @@ export default function SentenceFix({ onClose }) {
             30 segundos. 3 vidas.
           </p>
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-            <button className="xp-btn-primary" onClick={startGame}>COMENZAR</button>
-            <button className="xp-btn-secondary" onClick={() => setShowTutorial(true)}>¿CÓMO JUGAR?</button>
+          <button className="xp-btn-primary" onClick={startGame} disabled={loading} style={{ opacity: loading ? 0.5 : 1 }}>{loading ? 'CARGANDO...' : 'COMENZAR'}</button>
+          <button className="xp-btn-secondary" onClick={() => setShowTutorial(true)} disabled={loading} style={{ opacity: loading ? 0.5 : 1 }}>¿CÓMO JUGAR?</button>
           </div>
         </div>
         {showTutorial && (
@@ -430,7 +429,6 @@ export default function SentenceFix({ onClose }) {
         )}
       </div>
 
-      <Toast message={toast.msg} show={toast.show} onClose={() => setToast({ show: false, msg: '' })} />
     </div>
   );
 }

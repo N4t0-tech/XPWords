@@ -1,17 +1,19 @@
 import { useState, useEffect } from 'react';
 import SectionHeader from '../components/SectionHeader';
-import Toast from '../components/Toast';
+import Skeleton from '../components/Skeleton';
 import { api } from '../api/client';
+import { useToast } from '../components/ToastContext';
 
 export default function TeacherWords() {
+  const { showToast } = useToast();
+  const [loading, setLoading] = useState(true);
   const [words, setWords] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ word: '', hint: '', optA: '', optB: '', optC: '', optD: '', correctIndex: 0 });
-  const [toast, setToast] = useState({ show: false, msg: '' });
 
   useEffect(() => {
-    api.get('/words').then(setWords).catch(() => {});
+    api.get('/words').then(setWords).catch(err => showToast(err.message)).finally(() => setLoading(false));
   }, []);
 
   function parseOptions(str) {
@@ -59,15 +61,15 @@ export default function TeacherWords() {
       if (editing) {
         const updated = await api.put(`/words/${editing.id}`, payload);
         setWords(prev => prev.map(w => w.id === editing.id ? updated : w));
-        setToast({ show: true, msg: 'Palabra actualizada' });
+        showToast('Palabra actualizada');
       } else {
         const created = await api.post('/words', payload);
         setWords(prev => [...prev, created]);
-        setToast({ show: true, msg: 'Palabra creada' });
+        showToast('Palabra creada');
       }
       setShowForm(false);
     } catch (err) {
-      setToast({ show: true, msg: err.message });
+      showToast(err.message);
     }
   }
 
@@ -75,9 +77,9 @@ export default function TeacherWords() {
     try {
       await api.delete(`/words/${id}`);
       setWords(prev => prev.filter(w => w.id !== id));
-      setToast({ show: true, msg: 'Palabra eliminada' });
+      showToast('Palabra eliminada');
     } catch (err) {
-      setToast({ show: true, msg: err.message });
+      showToast(err.message);
     }
   }
 
@@ -91,30 +93,47 @@ export default function TeacherWords() {
       </div>
 
       <div className="xp-res-list">
-        {words.map(w => {
-          const opts = parseOptions(w.options);
-          return (
-            <div key={w.id} className="xp-word-card" style={{ background: '#0e1018', border: '1px solid #1c2030', borderRadius: '10px', padding: '1rem', marginBottom: '0.6rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '16px', fontWeight: 600, color: '#e2e8f0' }}>{w.word}</div>
-                <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '2px' }}>{w.hint}</div>
-                <div style={{ fontSize: '12px', color: '#4b5563', marginTop: '4px' }}>
-                  {opts.map((o, i) => (
-                    <span key={i} style={{ background: i === w.correctIndex ? '#1a3a1a' : '#13161f', padding: '2px 8px', borderRadius: '4px', marginRight: '4px', color: i === w.correctIndex ? '#4ade80' : '#9ca3af' }}>{LETTERS[i]}) {o}</span>
-                  ))}
+        {loading
+          ? [1,2,3,4].map(i => (
+              <div key={i} style={{ background: '#0e1018', border: '1px solid #1c2030', borderRadius: '10px', padding: '1rem', marginBottom: '0.6rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <Skeleton width="40%" height={16} />
+                  <Skeleton width="60%" height={14} />
+                  <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>
+                    {[1,2,3,4].map(j => <Skeleton key={j} width={60} height={22} borderRadius={4} />)}
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <Skeleton width={32} height={32} borderRadius={6} />
+                  <Skeleton width={32} height={32} borderRadius={6} />
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
-                <button className="xp-btn-sm" onClick={() => openEdit(w)} style={{ background: '#13161f', border: '1px solid #1c2030', borderRadius: '6px', padding: '6px 12px', fontSize: '13px', color: '#9ca3af', cursor: 'pointer' }}>
-                  <i className="ti ti-pencil" />
-                </button>
-                <button className="xp-btn-sm" onClick={() => handleDelete(w.id)} style={{ background: '#2a1010', border: '1px solid #3a1515', borderRadius: '6px', padding: '6px 12px', fontSize: '13px', color: '#f87171', cursor: 'pointer' }}>
-                  <i className="ti ti-trash" />
-                </button>
-              </div>
-            </div>
-          );
-        })}
+            ))
+          : words.map(w => {
+              const opts = parseOptions(w.options);
+              return (
+                <div key={w.id} className="xp-word-card" style={{ background: '#0e1018', border: '1px solid #1c2030', borderRadius: '10px', padding: '1rem', marginBottom: '0.6rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '16px', fontWeight: 600, color: '#e2e8f0' }}>{w.word}</div>
+                    <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '2px' }}>{w.hint}</div>
+                    <div style={{ fontSize: '12px', color: '#4b5563', marginTop: '4px' }}>
+                      {opts.map((o, i) => (
+                        <span key={i} style={{ background: i === w.correctIndex ? '#1a3a1a' : '#13161f', padding: '2px 8px', borderRadius: '4px', marginRight: '4px', color: i === w.correctIndex ? '#4ade80' : '#9ca3af' }}>{LETTERS[i]}) {o}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+                    <button className="xp-btn-sm" onClick={() => openEdit(w)} style={{ background: '#13161f', border: '1px solid #1c2030', borderRadius: '6px', padding: '6px 12px', fontSize: '13px', color: '#9ca3af', cursor: 'pointer' }}>
+                      <i className="ti ti-pencil" />
+                    </button>
+                    <button className="xp-btn-sm" onClick={() => handleDelete(w.id)} style={{ background: '#2a1010', border: '1px solid #3a1515', borderRadius: '6px', padding: '6px 12px', fontSize: '13px', color: '#f87171', cursor: 'pointer' }}>
+                      <i className="ti ti-trash" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+        }
       </div>
 
       {showForm && (
@@ -167,7 +186,6 @@ export default function TeacherWords() {
         </div>
       )}
 
-      <Toast message={toast.msg} show={toast.show} onClose={() => setToast({ show: false, msg: '' })} />
     </div>
   );
 }

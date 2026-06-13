@@ -1,20 +1,22 @@
 import { useState, useEffect } from 'react';
 import SectionHeader from '../components/SectionHeader';
-import Toast from '../components/Toast';
+import Skeleton from '../components/Skeleton';
 import { api } from '../api/client';
+import { useToast } from '../components/ToastContext';
 
 const ICONS = ['trophy', 'star', 'flame', 'zap', 'crown', 'shield', 'medal', 'award', 'rocket', 'heart',
   'diamond', 'sparkles', 'target', 'bolt', 'brain', 'book', 'code', 'music', 'palette', 'run'];
 
 export default function TeacherBadges() {
+  const { showToast } = useToast();
+  const [loading, setLoading] = useState(true);
   const [badges, setBadges] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ name: '', icon: 'trophy', description: '' });
-  const [toast, setToast] = useState({ show: false, msg: '' });
 
   useEffect(() => {
-    api.get('/badges').then(setBadges).catch(() => {});
+    api.get('/badges').then(setBadges).catch(err => showToast(err.message)).finally(() => setLoading(false));
   }, []);
 
   function openCreate() {
@@ -35,15 +37,15 @@ export default function TeacherBadges() {
       if (editing) {
         const updated = await api.put(`/badges/${editing.id}`, form);
         setBadges(prev => prev.map(b => b.id === editing.id ? updated : b));
-        setToast({ show: true, msg: 'Medalla actualizada' });
+        showToast('Medalla actualizada');
       } else {
         const created = await api.post('/badges', form);
         setBadges(prev => [...prev, created]);
-        setToast({ show: true, msg: 'Medalla creada' });
+        showToast('Medalla creada');
       }
       setShowForm(false);
     } catch (err) {
-      setToast({ show: true, msg: err.message });
+      showToast(err.message);
     }
   }
 
@@ -51,9 +53,9 @@ export default function TeacherBadges() {
     try {
       await api.delete(`/badges/${id}`);
       setBadges(prev => prev.filter(b => b.id !== id));
-      setToast({ show: true, msg: 'Medalla eliminada' });
+        showToast('Medalla eliminada');
     } catch (err) {
-      setToast({ show: true, msg: err.message });
+      showToast(err.message);
     }
   }
 
@@ -65,7 +67,21 @@ export default function TeacherBadges() {
       </div>
 
       <div className="xp-res-list">
-        {badges.map(b => (
+        {loading
+          ? [1,2,3,4].map(i => (
+              <div key={i} style={{ background: '#0e1018', border: '1px solid #1c2030', borderRadius: '10px', padding: '1rem', marginBottom: '0.6rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <Skeleton width={44} height={44} borderRadius={8} />
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <Skeleton width="40%" height={16} />
+                  <Skeleton width="60%" height={14} />
+                </div>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <Skeleton width={32} height={32} borderRadius={6} />
+                  <Skeleton width={32} height={32} borderRadius={6} />
+                </div>
+              </div>
+            ))
+          : badges.map(b => (
           <div key={b.id} style={{ background: '#0e1018', border: '1px solid #1c2030', borderRadius: '10px', padding: '1rem', marginBottom: '0.6rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <div style={{ fontSize: '28px', width: '44px', textAlign: 'center', color: '#fbbf24' }}>
               <i className={`ti ti-${b.icon}`} />
@@ -122,7 +138,6 @@ export default function TeacherBadges() {
         </div>
       )}
 
-      <Toast message={toast.msg} show={toast.show} onClose={() => setToast({ show: false, msg: '' })} />
     </div>
   );
 }

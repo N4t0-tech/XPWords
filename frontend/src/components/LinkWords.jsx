@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { api } from '../api/client';
-import Toast from './Toast';
 import Tutorial from './Tutorial';
+import { useToast } from './ToastContext';
 
 const ROUND_TIME = 60;
 const PAIRS_PER_ROUND = 4;
@@ -24,7 +24,8 @@ export default function LinkWords({ onClose }) {
   const [lives, setLives] = useState(3);
   const [totalPairs, setTotalPairs] = useState(0);
   const [maxStreak, setMaxStreak] = useState(0);
-  const [toast, setToast] = useState({ show: false, msg: '' });
+  const { showToast } = useToast();
+  const [loading, setLoading] = useState(true);
   const [showTutorial, setShowTutorial] = useState(false);
   const [words, setWords] = useState([]);
 
@@ -44,7 +45,7 @@ export default function LinkWords({ onClose }) {
   const streakRef = useRef(0);
   const scoreSubmitted = useRef(false);
 
-  const showToast = useCallback((msg) => setToast({ show: true, msg }), []);
+
 
   useEffect(() => { streakRef.current = streak; }, [streak]);
 
@@ -111,7 +112,7 @@ export default function LinkWords({ onClose }) {
         correct: w.correctIndex,
       }));
       setWords(parsed);
-    }).catch(() => {});
+    }).catch(err => showToast(err.message)).finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -119,7 +120,7 @@ export default function LinkWords({ onClose }) {
       scoreSubmitted.current = true;
       api.post('/games/score', { gameType: 'linkwords', score, streak: maxStreak, round })
         .then(() => window.dispatchEvent(new Event('user-updated')))
-        .catch(() => {});
+        .catch(err => showToast(err.message));
     }
   }, [status]);
 
@@ -220,8 +221,8 @@ const linkSteps = [
           4 pares por ronda. 60 segundos. 3 vidas.
         </p>
         <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-          <button className="xp-btn-primary" onClick={startGame}>COMENZAR</button>
-          <button className="xp-btn-secondary" onClick={() => setShowTutorial(true)}>¿CÓMO JUGAR?</button>
+          <button className="xp-btn-primary" onClick={startGame} disabled={loading} style={{ opacity: loading ? 0.5 : 1 }}>{loading ? 'CARGANDO...' : 'COMENZAR'}</button>
+          <button className="xp-btn-secondary" onClick={() => setShowTutorial(true)} disabled={loading} style={{ opacity: loading ? 0.5 : 1 }}>¿CÓMO JUGAR?</button>
         </div>
       </div>
       {showTutorial && (
@@ -317,7 +318,6 @@ const linkSteps = [
         </div>
       </div>
 
-      <Toast message={toast.msg} show={toast.show} onClose={() => setToast({ show: false, msg: '' })} />
     </div>
   );
 }

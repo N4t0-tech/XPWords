@@ -293,3 +293,14 @@ body{background:#0a0b0f;min-height:100vh;font-family:'Inter',sans-serif;color:#c
   .xp-landing-title{font-size:3rem}
   .xp-stats{grid-template-columns:repeat(2,1fr)}
 }
+
+@keyframes xp-shimmer {
+  0% { background-position: -400px 0 }
+  100% { background-position: calc(400px + 100%) 0 }
+}
+
+.xp-skeleton {
+  background: linear-gradient(90deg, #1c2030 25%, #252a3a 50%, #1c2030 75%);
+  background-size: 400px 100%;
+  animation: xp-shimmer 1.8s ease-in-out infinite;
+}

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { api } from '../api/client';
-import Toast from './Toast';
 import Tutorial from './Tutorial';
+import { useToast } from './ToastContext';
 
 const TIMER_SECONDS = 10;
 const STREAK_BONUS_EVERY = 3;
@@ -16,18 +16,15 @@ export default function MiniGame({ onClose }) {
   const [maxStreak, setMaxStreak] = useState(0);
   const [answered, setAnswered] = useState(false);
   const [lastPick, setLastPick] = useState(null);
+  const { showToast } = useToast();
+  const [loading, setLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState(TIMER_SECONDS);
-  const [toast, setToast] = useState({ show: false, msg: '' });
   const [showTutorial, setShowTutorial] = useState(false);
   const [words, setWords] = useState([]);
 
   const answeredRef = useRef(false);
   const intervalRef = useRef(null);
   const scoreSubmitted = useRef(false);
-
-  const showToast = useCallback((msg) => {
-    setToast({ show: true, msg });
-  }, []);
 
   useEffect(() => {
     answeredRef.current = answered;
@@ -52,7 +49,7 @@ export default function MiniGame({ onClose }) {
       scoreSubmitted.current = true;
       api.post('/games/score', { gameType: 'wordsnap', score, streak: maxStreak, round: index + 1 })
         .then(() => window.dispatchEvent(new Event('user-updated')))
-        .catch(() => {});
+        .catch(err => showToast(err.message));
     }
   }, [status]);
 
@@ -78,7 +75,7 @@ export default function MiniGame({ onClose }) {
         correct: w.correctIndex,
       }));
       setWords(parsed);
-    }).catch(() => {});
+    }).catch(err => showToast(err.message)).finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -174,8 +171,8 @@ export default function MiniGame({ onClose }) {
           Tienes 3 vidas. ¡Cada 3 aciertos consecutivos ganas XP extra!
         </p>
         <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-          <button className="xp-btn-primary" onClick={startGame}>COMENZAR</button>
-          <button className="xp-btn-secondary" onClick={() => setShowTutorial(true)}>¿CÓMO JUGAR?</button>
+          <button className="xp-btn-primary" onClick={startGame} disabled={loading} style={{ opacity: loading ? 0.5 : 1 }}>{loading ? 'CARGANDO...' : 'COMENZAR'}</button>
+          <button className="xp-btn-secondary" onClick={() => setShowTutorial(true)} disabled={loading} style={{ opacity: loading ? 0.5 : 1 }}>¿CÓMO JUGAR?</button>
         </div>
       </div>
       {showTutorial && (
@@ -273,11 +270,6 @@ export default function MiniGame({ onClose }) {
         )}
       </div>
 
-      <Toast
-        message={toast.msg}
-        show={toast.show}
-        onClose={() => setToast({ show: false, msg: '' })}
-      />
     </div>
   );
 }

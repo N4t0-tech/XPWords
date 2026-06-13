@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import SectionHeader from '../components/SectionHeader';
-import Toast from '../components/Toast';
+import Skeleton from '../components/Skeleton';
 import { api } from '../api/client';
+import { useToast } from '../components/ToastContext';
 
 const statusLabels = {
   PENDING: 'Pendiente',
@@ -16,11 +17,12 @@ const statusColors = {
 };
 
 export default function TeacherRequests() {
+  const { showToast } = useToast();
+  const [loading, setLoading] = useState(true);
   const [requests, setRequests] = useState([]);
-  const [toast, setToast] = useState({ show: false, msg: '' });
 
   useEffect(() => {
-    api.get('/class-requests?as=teacher').then(setRequests).catch(() => {});
+    api.get('/class-requests?as=teacher').then(setRequests).catch(err => showToast(err.message)).finally(() => setLoading(false));
   }, []);
 
   async function handleStatus(id, status) {
@@ -28,9 +30,9 @@ export default function TeacherRequests() {
       await api.put(`/class-requests/${id}/status`, { status });
       setRequests(prev => prev.map(r => r.id === id ? { ...r, status } : r));
       const label = status === 'APPROVED' ? 'aprobada' : 'rechazada';
-      setToast({ show: true, msg: `Solicitud ${label}` });
+      showToast(`Solicitud ${label}`);
     } catch (err) {
-      setToast({ show: true, msg: err.message });
+      showToast(err.message);
     }
   }
 
@@ -44,14 +46,27 @@ export default function TeacherRequests() {
     <div className="xp-body">
       <SectionHeader icon="messages" label="SOLICITUDES DE CLASES" />
 
-      {requests.length === 0 && (
-        <p style={{ color: '#4b5563', fontSize: '14px', textAlign: 'center', padding: '2rem' }}>
-          No tienes solicitudes pendientes
-        </p>
-      )}
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        {requests.map(r => (
+      {loading
+        ? <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {[1,2,3,4].map(i => (
+              <div key={i} className="xp-res-item" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <Skeleton width={44} height={44} borderRadius={10} />
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <Skeleton width="40%" height={16} />
+                  <Skeleton width="60%" height={14} />
+                </div>
+                <Skeleton width={80} height={30} borderRadius={6} />
+              </div>
+            ))}
+          </div>
+        : <>
+            {requests.length === 0 && (
+              <p style={{ color: '#4b5563', fontSize: '14px', textAlign: 'center', padding: '2rem' }}>
+                No tienes solicitudes pendientes
+              </p>
+            )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {requests.map(r => (
           <div key={r.id} className="xp-res-item" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <div className="xp-res-thumb link" style={{ background: '#1a1230', color: '#a78bfa' }}>
               <i className="ti ti-user-question" aria-hidden="true" />
@@ -90,9 +105,10 @@ export default function TeacherRequests() {
             </div>
           </div>
         ))}
-      </div>
+            </div>
+          </>
+      }
 
-      <Toast message={toast.msg} show={toast.show} onClose={() => setToast({ show: false, msg: '' })} />
     </div>
   );
 }

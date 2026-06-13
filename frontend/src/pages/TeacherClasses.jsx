@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react';
 import SectionHeader from '../components/SectionHeader';
-import Toast from '../components/Toast';
+import Skeleton from '../components/Skeleton';
 import { api } from '../api/client';
+import { useToast } from '../components/ToastContext';
 
 export default function TeacherClasses() {
+  const { showToast } = useToast();
+  const [loading, setLoading] = useState(true);
   const [classes, setClasses] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: '', description: '', date: '' });
-  const [toast, setToast] = useState({ show: false, msg: '' });
 
   useEffect(() => {
-    api.get('/classes').then(setClasses).catch(() => {});
+    api.get('/classes').then(setClasses).catch(err => showToast(err.message)).finally(() => setLoading(false));
   }, []);
 
   async function handleCreate(e) {
@@ -24,9 +26,9 @@ export default function TeacherClasses() {
       setClasses(prev => [...prev, created].sort((a, b) => new Date(a.date) - new Date(b.date)));
       setShowForm(false);
       setForm({ title: '', description: '', date: '' });
-      setToast({ show: true, msg: 'Clase creada' });
+      showToast('Clase creada');
     } catch (err) {
-      setToast({ show: true, msg: err.message });
+      showToast(err.message);
     }
   }
 
@@ -34,9 +36,9 @@ export default function TeacherClasses() {
     try {
       await api.delete(`/classes/${id}`);
       setClasses(prev => prev.filter(c => c.id !== id));
-      setToast({ show: true, msg: 'Clase eliminada' });
+      showToast('Clase eliminada');
     } catch (err) {
-      setToast({ show: true, msg: err.message });
+      showToast(err.message);
     }
   }
 
@@ -52,14 +54,27 @@ export default function TeacherClasses() {
         <button className="xp-btn-primary" onClick={() => setShowForm(true)}>AÑADIR CLASE</button>
       </div>
 
-      {classes.length === 0 && (
-        <p style={{ color: '#4b5563', fontSize: '14px', textAlign: 'center', padding: '2rem' }}>
-          No tienes clases programadas
-        </p>
-      )}
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        {classes.map(c => (
+      {loading
+        ? <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {[1,2,3,4].map(i => (
+              <div key={i} className="xp-res-item" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <Skeleton width={44} height={44} borderRadius={10} />
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <Skeleton width="50%" height={16} />
+                  <Skeleton width="70%" height={14} />
+                </div>
+                <Skeleton width={32} height={32} borderRadius={6} />
+              </div>
+            ))}
+          </div>
+        : <>
+            {classes.length === 0 && (
+              <p style={{ color: '#4b5563', fontSize: '14px', textAlign: 'center', padding: '2rem' }}>
+                No tienes clases programadas
+              </p>
+            )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {classes.map(c => (
           <div key={c.id} className="xp-res-item" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div className="xp-res-thumb link" style={{ background: '#0d2420', color: '#6ee7b7' }}>
               <i className="ti ti-calendar-event" aria-hidden="true" />
@@ -77,7 +92,9 @@ export default function TeacherClasses() {
             </button>
           </div>
         ))}
-      </div>
+            </div>
+          </>
+      }
 
       {showForm && (
         <div className="xp-modal-overlay" onClick={() => setShowForm(false)}>
@@ -117,7 +134,6 @@ export default function TeacherClasses() {
         </div>
       )}
 
-      <Toast message={toast.msg} show={toast.show} onClose={() => setToast({ show: false, msg: '' })} />
     </div>
   );
 }
