@@ -3,6 +3,7 @@ import { api, getAuthBaseUrl } from '../api/client';
 
 export default function AuthModal({ mode, onClose, onLogin }) {
   const [tab, setTab] = useState(mode || 'login');
+  const [view, setView] = useState('form');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -10,6 +11,11 @@ export default function AuthModal({ mode, onClose, onLogin }) {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState('');
+
+  const [resetCode, setResetCode] = useState('');
+  const [resetPassword, setResetPassword] = useState('');
+  const [resetConfirm, setResetConfirm] = useState('');
 
   function validate() {
     if (!email || !password) {
@@ -51,8 +57,160 @@ export default function AuthModal({ mode, onClose, onLogin }) {
     }
   }
 
+  async function handleForgotPassword(e) {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    if (!email) { setError('Ingresa tu email'); return; }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) { setError('Email no válido'); return; }
+
+    setLoading(true);
+    try {
+      await api.post('/auth/forgot-password', { email });
+      setSuccess('Si el email existe, recibirás un código de recuperación');
+      setView('resetCode');
+    } catch (err) {
+      setError(err?.message || 'Error inesperado');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleResetPassword(e) {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    if (!resetCode || resetCode.length !== 6) { setError('El código debe tener 6 dígitos'); return; }
+    if (!resetPassword || resetPassword.length < 6) { setError('La contraseña debe tener al menos 6 caracteres'); return; }
+    if (resetPassword !== resetConfirm) { setError('Las contraseñas no coinciden'); return; }
+
+    setLoading(true);
+    try {
+      await api.post('/auth/reset-password', { code: resetCode, newPassword: resetPassword });
+      setSuccess('Contraseña actualizada correctamente');
+      setTimeout(() => {
+        setView('form');
+        setTab('login');
+        setResetCode('');
+        setResetPassword('');
+        setResetConfirm('');
+        setSuccess('');
+      }, 2000);
+    } catch (err) {
+      setError(err?.message || 'Error inesperado');
+    } finally {
+      setLoading(false);
+    }
+  }
+
   function handleDiscord() {
     window.location.href = `${getAuthBaseUrl()}/oauth2/authorization/discord`;
+  }
+
+  function backToLogin() {
+    setView('form');
+    setTab('login');
+    setError('');
+    setSuccess('');
+  }
+
+  if (view === 'forgot') {
+    return (
+      <div className="xp-modal-overlay" onClick={onClose}>
+        <div className="xp-modal" onClick={e => e.stopPropagation()}>
+          <button className="xp-modal-close" onClick={onClose}>✕</button>
+          <h2 style={{ color: '#e2e8f0', marginBottom: '1.5rem', fontSize: '1.2rem' }}>Recuperar contraseña</h2>
+
+          <form className="xp-modal-form" onSubmit={handleForgotPassword}>
+            <div className="xp-modal-field">
+              <label htmlFor="forgot-email">Email</label>
+              <input
+                id="forgot-email"
+                type="email"
+                placeholder="correo@ejemplo.com"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+              />
+            </div>
+
+            {error && <div className="xp-error-msg">{error}</div>}
+            {success && <div className="xp-success-msg">{success}</div>}
+
+            <button type="submit" className="xp-btn-primary" style={{ width: '100%' }} disabled={loading}>
+              {loading ? 'ENVIANDO...' : 'ENVIAR CÓDIGO'}
+            </button>
+          </form>
+
+          <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+            <button onClick={backToLogin} style={{ background: 'none', border: 'none', color: '#a78bfa', cursor: 'pointer', fontSize: '13px' }}>
+              ← Volver a iniciar sesión
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (view === 'resetCode') {
+    return (
+      <div className="xp-modal-overlay" onClick={onClose}>
+        <div className="xp-modal" onClick={e => e.stopPropagation()}>
+          <button className="xp-modal-close" onClick={onClose}>✕</button>
+          <h2 style={{ color: '#e2e8f0', marginBottom: '1.5rem', fontSize: '1.2rem' }}>Nueva contraseña</h2>
+
+          <form className="xp-modal-form" onSubmit={handleResetPassword}>
+            <div className="xp-modal-field">
+              <label htmlFor="reset-code">Código de recuperación</label>
+              <input
+                id="reset-code"
+                type="text"
+                placeholder="123456"
+                maxLength={6}
+                value={resetCode}
+                onChange={e => setResetCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              />
+            </div>
+
+            <div className="xp-modal-field">
+              <label htmlFor="reset-password">Nueva contraseña</label>
+              <input
+                id="reset-password"
+                type="password"
+                placeholder="••••••••"
+                value={resetPassword}
+                onChange={e => setResetPassword(e.target.value)}
+              />
+            </div>
+
+            <div className="xp-modal-field">
+              <label htmlFor="reset-confirm">Confirmar contraseña</label>
+              <input
+                id="reset-confirm"
+                type="password"
+                placeholder="••••••••"
+                value={resetConfirm}
+                onChange={e => setResetConfirm(e.target.value)}
+              />
+            </div>
+
+            {error && <div className="xp-error-msg">{error}</div>}
+            {success && <div className="xp-success-msg">{success}</div>}
+
+            <button type="submit" className="xp-btn-primary" style={{ width: '100%' }} disabled={loading}>
+              {loading ? 'CAMBIANDO...' : 'CAMBIAR CONTRASEÑA'}
+            </button>
+          </form>
+
+          <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+            <button onClick={backToLogin} style={{ background: 'none', border: 'none', color: '#a78bfa', cursor: 'pointer', fontSize: '13px' }}>
+              ← Volver a iniciar sesión
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -132,6 +290,18 @@ export default function AuthModal({ mode, onClose, onLogin }) {
               Recordarme
             </label>
           </div>
+
+          {tab === 'login' && (
+            <div style={{ textAlign: 'right', marginTop: '-0.5rem', marginBottom: '0.5rem' }}>
+              <button
+                type="button"
+                onClick={() => setView('forgot')}
+                style={{ background: 'none', border: 'none', color: '#a78bfa', cursor: 'pointer', fontSize: '13px' }}
+              >
+                ¿Olvidaste tu contraseña?
+              </button>
+            </div>
+          )}
 
           {error && <div className="xp-error-msg">{error}</div>}
 
