@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api, getAuthBaseUrl } from '../api/client';
 
-export default function AuthModal({ mode, onClose, onLogin }) {
+export default function AuthModal({ mode, error: initialError, onClose, onLogin }) {
   const [tab, setTab] = useState(mode || 'login');
   const [view, setView] = useState('form');
   const [email, setEmail] = useState('');
@@ -12,6 +12,10 @@ export default function AuthModal({ mode, onClose, onLogin }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
+
+  useEffect(() => {
+    if (initialError) setError(initialError);
+  }, [initialError]);
 
   const [resetCode, setResetCode] = useState('');
   const [resetPassword, setResetPassword] = useState('');
