@@ -6,7 +6,10 @@ export default function Landing({ onOpenAuth }) {
 
   if (discordError) {
     window.history.replaceState({}, '', '/');
-    setTimeout(() => onOpenAuth({ mode: 'login', error: 'Inicio de sesión con Discord cancelado' }), 0);
+    const msg = discordError === 'account_disabled'
+      ? 'Tu cuenta ha sido desactivada'
+      : 'Inicio de sesión con Discord cancelado';
+    setTimeout(() => onOpenAuth({ mode: 'login', error: msg }), 0);
   }
 
   return (

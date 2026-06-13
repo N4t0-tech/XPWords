@@ -26,7 +26,8 @@ export default function DeleteAccountModal({ onClose, onDone }) {
         <button className="xp-modal-close" onClick={onClose}>✕</button>
         <div className="xp-mini-title" style={{ marginBottom: '.8rem', fontSize: '18px', color: '#f87171' }}>Eliminar cuenta</div>
         <p style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '1.2rem', lineHeight: 1.6 }}>
-          Esta acción es irreversible. Se perderán todos tus datos, XP, insignias e historial.
+          Tu cuenta será desactivada. No podrás iniciar sesión hasta que un administrador la reactive.
+          Tus datos, XP e insignias se conservarán.
         </p>
         <form className="xp-modal-form" onSubmit={handleSubmit}>
           <div className="xp-modal-field">

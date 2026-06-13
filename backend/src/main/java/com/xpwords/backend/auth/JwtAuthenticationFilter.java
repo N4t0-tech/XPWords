@@ -1,5 +1,6 @@
 package com.xpwords.backend.auth;
 
+import com.xpwords.backend.user.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,9 +17,11 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
 
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UserRepository userRepository) {
         this.jwtTokenProvider = jwtTokenProvider;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -32,10 +35,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (jwtTokenProvider.validateToken(token)) {
                 Long userId = jwtTokenProvider.getUserIdFromToken(token);
-                String role = jwtTokenProvider.getRoleFromToken(token);
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(userId, null, List.of(() -> "ROLE_" + role));
-                SecurityContextHolder.getContext().setAuthentication(auth);
+                boolean active = userRepository.findById(userId)
+                        .map(u -> u.isActive())
+                        .orElse(false);
+                if (active) {
+                    String role = jwtTokenProvider.getRoleFromToken(token);
+                    UsernamePasswordAuthenticationToken auth =
+                            new UsernamePasswordAuthenticationToken(userId, null, List.of(() -> "ROLE_" + role));
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
             }
         }
 

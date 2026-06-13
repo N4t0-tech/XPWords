@@ -16,4 +16,5 @@ public class UserProfileResponse {
     private int xp;
     private String avatarBg;
     private String role;
+    private boolean active;
 }

@@ -67,6 +67,10 @@ public class DiscordAuthSuccessHandler implements AuthenticationSuccessHandler {
 
         if (existing.isPresent()) {
                 user = existing.get();
+                if (!user.isActive()) {
+                    response.sendRedirect(frontendUrl + "/?discord_error=account_disabled");
+                    return;
+                }
                 user.setDiscordTag(discordTag);
                 user.setDiscordAvatar(discordAvatar);
                 userRepository.save(user);
@@ -74,6 +78,10 @@ public class DiscordAuthSuccessHandler implements AuthenticationSuccessHandler {
                 Optional<User> byEmail = userRepository.findByEmail(email);
                 if (byEmail.isPresent()) {
                     user = byEmail.get();
+                    if (!user.isActive()) {
+                        response.sendRedirect(frontendUrl + "/?discord_error=account_disabled");
+                        return;
+                    }
                     user.setDiscordId(discordId);
                     user.setDiscordTag(discordTag);
                     user.setDiscordAvatar(discordAvatar);
