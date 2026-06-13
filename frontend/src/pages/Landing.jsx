@@ -1,4 +1,14 @@
+import { useSearchParams } from 'react-router-dom';
+
 export default function Landing({ onOpenAuth }) {
+  const [searchParams] = useSearchParams();
+  const discordError = searchParams.get('discord_error');
+
+  if (discordError) {
+    window.history.replaceState({}, '', '/');
+    setTimeout(() => onOpenAuth('login'), 0);
+  }
+
   return (
     <div className="xp-body">
       <div className="xp-landing">
@@ -11,6 +21,11 @@ export default function Landing({ onOpenAuth }) {
             Clases, minijuegos y recursos para la comunidad del servidor.<br />
             Cada clase y juego te da XP real. ¿Hasta qué nivel llegas?
           </p>
+          {discordError && (
+            <p style={{ color: '#f87171', fontSize: '13px', marginBottom: '1rem' }}>
+              Inicio de sesión con Discord cancelado
+            </p>
+          )}
           <div className="xp-landing-cta">
             <button className="xp-btn-primary" onClick={() => onOpenAuth('register')}>
               CREAR CUENTA
