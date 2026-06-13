@@ -98,7 +98,7 @@ function WordEditor({ game, onBack }) {
     try {
       await api.delete(`/words/${wordId}`);
       setWords(prev => prev.filter(w => w.id !== wordId));
-        showToast('Palabra eliminada');
+      showToast('Palabra eliminada');
     } catch (err) {
       showToast(err.message);
     }

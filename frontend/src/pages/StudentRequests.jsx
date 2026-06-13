@@ -4,18 +4,6 @@ import Skeleton from '../components/Skeleton';
 import { api } from '../api/client';
 import { useToast } from '../components/ToastContext';
 
-const statusLabels = {
-  PENDING: 'Pendiente',
-  APPROVED: 'Aprobada',
-  REJECTED: 'Rechazada',
-};
-
-const statusColors = {
-  PENDING: '#f59e0b',
-  APPROVED: '#6ee7b7',
-  REJECTED: '#f87171',
-};
-
 export default function StudentRequests({ user }) {
   const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
@@ -157,6 +145,9 @@ export default function StudentRequests({ user }) {
                 {formatDate(r.createdAt)}
               </div>
             </div>
+            <span style={{ fontSize: '13px', fontWeight: '600', color: {PENDING:'#f59e0b',APPROVED:'#6ee7b7',REJECTED:'#f87171'}[r.status] || '#6b7280' }}>
+              {{PENDING:'Pendiente',APPROVED:'Aprobada',REJECTED:'Rechazada'}[r.status] || r.status}
+            </span>
           </div>
         ))}
             </div>

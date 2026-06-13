@@ -51,7 +51,7 @@ export default function TeacherResources() {
     try {
       await api.delete(`/resources/${id}`);
       setResources(prev => prev.filter(r => r.id !== id));
-        showToast('Recurso eliminado');
+      showToast('Recurso eliminado');
     } catch (err) {
       showToast(err.message);
     }

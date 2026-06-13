@@ -53,7 +53,7 @@ export default function TeacherBadges() {
     try {
       await api.delete(`/badges/${id}`);
       setBadges(prev => prev.filter(b => b.id !== id));
-        showToast('Medalla eliminada');
+      showToast('Medalla eliminada');
     } catch (err) {
       showToast(err.message);
     }

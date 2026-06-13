@@ -3,7 +3,6 @@ package com.xpwords.backend.auth;
 import com.xpwords.backend.user.Role;
 import com.xpwords.backend.user.User;
 import com.xpwords.backend.user.UserRepository;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,9 +19,6 @@ public class AuthService {
     private final TokenRepository tokenRepository;
     private final MailService mailService;
     private final SecureRandom secureRandom = new SecureRandom();
-
-    @Value("${app.frontend-url}")
-    private String frontendUrl;
 
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
