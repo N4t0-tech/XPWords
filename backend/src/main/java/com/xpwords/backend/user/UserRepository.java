@@ -10,4 +10,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByDiscordId(String discordId);
     boolean existsByEmail(String email);
     List<User> findByRole(Role role);
+    List<User> findAllByOrderByXpDesc();
 }
