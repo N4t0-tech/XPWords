@@ -18,16 +18,19 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CorsConfigurationSource corsConfigurationSource;
     private final DiscordAuthSuccessHandler discordAuthSuccessHandler;
+    private final ApiAuthenticationEntryPoint authenticationEntryPoint;
 
     @Value("${app.frontend-url}")
     private String frontendUrl;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
                           CorsConfigurationSource corsConfigurationSource,
-                          DiscordAuthSuccessHandler discordAuthSuccessHandler) {
+                          DiscordAuthSuccessHandler discordAuthSuccessHandler,
+                          ApiAuthenticationEntryPoint authenticationEntryPoint) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.corsConfigurationSource = corsConfigurationSource;
         this.discordAuthSuccessHandler = discordAuthSuccessHandler;
+        this.authenticationEntryPoint = authenticationEntryPoint;
     }
 
     @Bean
@@ -72,6 +75,7 @@ public class SecurityConfig {
                 .successHandler(discordAuthSuccessHandler)
                 .failureUrl(frontendUrl + "/?discord_error=access_denied")
             )
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(authenticationEntryPoint))
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
