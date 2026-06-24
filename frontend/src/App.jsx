@@ -24,9 +24,15 @@ import './App.css';
 
 export default function App() {
   const { showToast } = useToast();
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [authMode, setAuthMode] = useState(null);
   const [authError, setAuthError] = useState(null);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('light-mode', theme === 'light');
+    localStorage.setItem('theme', theme);
+  }, [theme]);
   const openAuth = (param) => {
     if (typeof param === 'string') {
       setAuthMode(param);
@@ -109,7 +115,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <div className="xp">
-        {isLoggedIn && <Navbar user={user} viewMode={effectiveView} onToggleView={handleToggleView} />}
+        {isLoggedIn && <Navbar user={user} viewMode={effectiveView} onToggleView={handleToggleView} theme={theme} onToggleTheme={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} />}
         <main className="xp-main">
         <Routes>
           <Route

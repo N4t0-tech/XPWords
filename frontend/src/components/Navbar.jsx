@@ -20,7 +20,7 @@ const studentTabs = [
   { path: '/requests', label: 'Solicitudes' },
 ];
 
-export default function Navbar({ user, viewMode, onToggleView }) {
+export default function Navbar({ user, viewMode, onToggleView, theme, onToggleTheme }) {
   const { pathname } = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isTeacherView = viewMode === 'teacher';
@@ -75,6 +75,10 @@ export default function Navbar({ user, viewMode, onToggleView }) {
           <Link to="/profile" style={{ textDecoration: 'none', alignSelf: 'flex-start' }} onClick={closeSidebar}>
             <UserChip user={user} />
           </Link>
+          <button className="xp-view-toggle" onClick={onToggleTheme} style={{ justifyContent: 'center', width: '100%' }}>
+            <i className={`ti ti-${theme === 'light' ? 'sun' : 'moon'}`} style={{ fontSize: 16 }} />
+            <span style={{ fontSize: 13 }}>{theme === 'light' ? 'Modo oscuro' : 'Modo claro'}</span>
+          </button>
           {user?.role === 'MODERATOR' && (
             <button className="xp-view-toggle" onClick={onToggleView}>
               <span className={`xp-view-opt${isTeacherView ? ' active' : ''}`}>Profe</span>

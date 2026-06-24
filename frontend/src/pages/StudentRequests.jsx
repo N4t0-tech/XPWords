@@ -88,18 +88,16 @@ export default function StudentRequests({ user }) {
               placeholder="¿Sobre qué te gustaría trabajar?"
               value={message}
               onChange={e => setMessage(e.target.value)}
-              style={{ background: '#13161f', border: '1px solid #1c2030', borderRadius: '7px', padding: '12px 14px', fontSize: '14px', color: '#e2e8f0', fontFamily: 'Inter, sans-serif', outline: 'none', resize: 'vertical' }}
             />
           </div>
           <div className="xp-modal-field">
             <label htmlFor="req-date">Fecha preferida (opcional)</label>
-            <input
-              id="req-date"
-              type="datetime-local"
-              value={requestedDate}
-              onChange={e => setRequestedDate(e.target.value)}
-              style={{ background: '#13161f', border: '1px solid #1c2030', borderRadius: '7px', padding: '12px 14px', fontSize: '14px', color: '#e2e8f0', fontFamily: 'Inter, sans-serif', outline: 'none', colorScheme: 'dark' }}
-            />
+              <input
+                id="req-date"
+                type="datetime-local"
+                value={requestedDate}
+                onChange={e => setRequestedDate(e.target.value)}
+              />
           </div>
           <button type="submit" className="xp-btn-primary" style={{ alignSelf: 'flex-start' }} disabled={sending}>
             {sending ? 'ENVIANDO...' : 'ENVIAR SOLICITUD'}
@@ -125,14 +123,14 @@ export default function StudentRequests({ user }) {
           </div>
         : <>
             {requests.length === 0 && (
-              <p style={{ color: '#4b5563', fontSize: '14px', textAlign: 'center', padding: '2rem' }}>
+              <p style={{ color: 'var(--text-muted2)', fontSize: '14px', textAlign: 'center', padding: '2rem' }}>
                 No has enviado ninguna solicitud
               </p>
             )}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {requests.map(r => (
           <div key={r.id} className="xp-res-item" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-            <div className="xp-res-thumb link" style={{ background: '#1a1230', color: '#a78bfa' }}>
+            <div className="xp-res-thumb link" style={{ background: 'var(--bg-purple)', color: 'var(--purple)' }}>
               <i className="ti ti-mail" aria-hidden="true" />
             </div>
             <div className="xp-res-info" style={{ flex: 1, minWidth: '200px' }}>
@@ -140,12 +138,12 @@ export default function StudentRequests({ user }) {
               <div className="xp-res-meta">
                 Profesor: {r.teacherName || `#${r.teacherId}`}
               </div>
-              {r.message && <div className="xp-res-meta" style={{ marginTop: '2px', color: '#6b7280' }}>{r.message}</div>}
+              {r.message && <div className="xp-res-meta" style={{ marginTop: '2px', color: 'var(--text-muted)' }}>{r.message}</div>}
               <div className="xp-res-meta" style={{ marginTop: '2px' }}>
                 {formatDate(r.createdAt)}
               </div>
             </div>
-            <span style={{ fontSize: '13px', fontWeight: '600', color: {PENDING:'#f59e0b',APPROVED:'#6ee7b7',REJECTED:'#f87171'}[r.status] || '#6b7280' }}>
+            <span style={{ fontSize: '13px', fontWeight: '600', color: {PENDING:'var(--gold)',APPROVED:'var(--accent)',REJECTED:'var(--red)'}[r.status] || 'var(--text-muted)' }}>
               {{PENDING:'Pendiente',APPROVED:'Aprobada',REJECTED:'Rechazada'}[r.status] || r.status}
             </span>
           </div>
