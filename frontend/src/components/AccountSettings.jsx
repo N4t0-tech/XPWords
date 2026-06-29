@@ -39,7 +39,7 @@ export default function AccountSettings({ user, onLogout }) {
       <div className="xp-settings-actions">
         <div className="xp-settings-row">
           <div className="xp-settings-row-info">
-            <i className="ti ti-badge" aria-hidden="true" style={{ color: '#a78bfa' }} />
+            <i className="ti ti-badge" aria-hidden="true" style={{ color: 'var(--purple)' }} />
             <span>Rol: <strong className={`xp-role-badge xp-role-${role.toLowerCase()}`}>{role === 'STUDENT' ? 'Estudiante' : role === 'TEACHER' ? 'Profesor' : 'Moderador'}</strong></span>
           </div>
         </div>
@@ -58,7 +58,7 @@ export default function AccountSettings({ user, onLogout }) {
           <div className="xp-settings-row">
             <div className="xp-settings-row-info">
               <i className="ti ti-brand-discord" aria-hidden="true" style={{ color: '#5865f2' }} />
-              <span>Discord: <strong style={{ color: '#e2e8f0' }}>{discordTag || 'No conectado'}</strong></span>
+              <span>Discord: <strong style={{ color: 'var(--text-heading)' }}>{discordTag || 'No conectado'}</strong></span>
             </div>
             {discordTag ? (
               <button className="xp-settings-btn xp-settings-btn-sm" onClick={handleDisconnectDiscord}>

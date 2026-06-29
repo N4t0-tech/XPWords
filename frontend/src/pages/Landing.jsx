@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { api } from '../api/client';
 
-export default function Landing({ onOpenAuth }) {
+export default function Landing({ onOpenAuth, theme, onToggleTheme }) {
   const [searchParams] = useSearchParams();
   const [stats, setStats] = useState(null);
   const discordError = searchParams.get('discord_error');
@@ -21,6 +21,9 @@ export default function Landing({ onOpenAuth }) {
 
   return (
     <div className="xp-body">
+      <button className="xp-theme-toggle" onClick={onToggleTheme} aria-label="Cambiar tema">
+        <i className={`ti ti-${theme === 'light' ? 'moon' : 'sun'}`} />
+      </button>
       <div className="xp-landing">
         <div className="xp-landing-hero">
           <div className="xp-landing-logo">XP<span>Words</span></div>

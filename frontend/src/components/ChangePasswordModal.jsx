@@ -45,7 +45,7 @@ export default function ChangePasswordModal({ onClose, onDone }) {
             <label htmlFor="pw-confirm">Confirmar nueva contraseña</label>
             <input id="pw-confirm" type="password" placeholder="••••••••" value={confirm} onChange={e => setConfirm(e.target.value)} />
           </div>
-          {error && <p style={{ color: '#f87171', fontSize: '13px' }}>{error}</p>}
+          {error && <p className="xp-error-msg">{error}</p>}
           <button type="submit" className="xp-btn-primary" style={{ width: '100%' }} disabled={loading || newPw !== confirm || !current}>
             {loading ? 'CARGANDO...' : 'CAMBIAR CONTRASEÑA'}
           </button>

@@ -125,10 +125,10 @@ export default function App() {
           <Route
             path="/"
             element={
-              isLoggedIn ? <Navigate to="/home" replace /> : <Landing onOpenAuth={openAuth} />
+              isLoggedIn ? <Navigate to="/home" replace /> : <Landing onOpenAuth={openAuth} theme={theme} onToggleTheme={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} />
             }
           />
-          <Route path="/home" element={<AuthGuard isLoggedIn={isLoggedIn}><Home /></AuthGuard>} />
+          <Route path="/home" element={<AuthGuard isLoggedIn={isLoggedIn}><Home user={user} /></AuthGuard>} />
           <Route path="/games" element={<AuthGuard isLoggedIn={isLoggedIn}><Games /></AuthGuard>} />
           <Route path="/resources" element={<AuthGuard isLoggedIn={isLoggedIn}><Resources /></AuthGuard>} />
           <Route path="/requests" element={<AuthGuard isLoggedIn={isLoggedIn}><StudentRequests user={user} /></AuthGuard>} />

@@ -41,7 +41,7 @@ export default function SetPasswordModal({ onClose, onDone }) {
           <span>ESTABLECER CONTRASEÑA</span>
         </div>
 
-        <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '1rem', lineHeight: '1.5' }}>
+        <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '1rem', lineHeight: '1.5' }}>
           Tu cuenta fue creada con Discord. Establecé una contraseña para poder iniciar sesión también con email y contraseña.
         </p>
 

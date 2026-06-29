@@ -72,13 +72,14 @@ export default function Navbar({ user, viewMode, onToggleView, theme, onToggleTh
         </nav>
 
         <div className="xp-sidebar-footer">
-          <Link to="/profile" style={{ textDecoration: 'none', alignSelf: 'flex-start' }} onClick={closeSidebar}>
-            <UserChip user={user} />
-          </Link>
-          <button className="xp-view-toggle" onClick={onToggleTheme} style={{ justifyContent: 'center', width: '100%' }}>
-            <i className={`ti ti-${theme === 'light' ? 'sun' : 'moon'}`} style={{ fontSize: 16 }} />
-            <span style={{ fontSize: 13 }}>{theme === 'light' ? 'Modo oscuro' : 'Modo claro'}</span>
-          </button>
+          <div className="xp-sidebar-footer-top">
+            <Link to="/profile" style={{ textDecoration: 'none', flex: 1, minWidth: 0 }} onClick={closeSidebar}>
+              <UserChip user={user} />
+            </Link>
+            <button className="xp-sidebar-theme-btn" onClick={onToggleTheme} aria-label="Cambiar tema">
+              <i className={`ti ti-${theme === 'light' ? 'moon' : 'sun'}`} />
+            </button>
+          </div>
           {user?.role === 'MODERATOR' && (
             <button className="xp-view-toggle" onClick={onToggleView}>
               <span className={`xp-view-opt${isTeacherView ? ' active' : ''}`}>Profe</span>
